@@ -1,0 +1,347 @@
+import re
+
+with open('estadisticas-sneep.html', 'r', encoding='utf-8') as f:
+    orig = f.read()
+
+m = re.search(r'(<script>\s*\(function \(\) \{\s*var RAW[\s\S]+?\}\)\(\);\s*</script>)', orig)
+if not m:
+    print('Script not found')
+    exit(1)
+js_script = m.group(1)
+
+html_template = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SNEEP - Censo Penitenciario Nacional | Argentina.gob.ar</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" media="all">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://argob.github.io/poncho/node_modules/argob-poncho/dist/css/poncho.min.css" rel="stylesheet">
+    <link href="https://argob.github.io/poncho/node_modules/argob-poncho/dist/icono-arg.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/datosgobar/series-tiempo-ar-explorer@ts_components_2.6.2/dist/css/components.css" type="text/css">
+
+    <style>
+        body { font-family: 'Montserrat', sans-serif; background-color: #f9f9f9; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .poncho-shadow { box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05); }
+        .pill-card { border-radius: 2rem; transition: transform 0.2s ease, border-color 0.2s ease; }
+        .pill-card:hover { transform: translateY(-4px); }
+        .glass-header { backdrop-filter: blur(8px); background-color: rgba(255, 255, 255, 0.9); z-index: 40; position: sticky; top: 0;}
+        
+        .hero-section {
+            background: linear-gradient(135deg, #005991 0%, #0072b8 100%);
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-grid {
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0; opacity: 0.1;
+            background-image: linear-gradient(to right, #f1f1f1 1px, transparent 1px), linear-gradient(to bottom, #f1f1f1 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .pill-kpi { border-radius: 1.5rem; background: white; padding: 20px; border: 1px solid #e5e5e5; }
+        .rounded-3xl { border-radius: 1.5rem; }
+        .border-l-primary { border-left: 4px solid #005991 !important; }
+        
+        .text-primary { color: #005991; }
+        .bg-primary { background-color: #005991; }
+        .bg-surface { background-color: #f3f3f3; }
+        .text-success { color: #2E7D32; }
+        .text-error { color: #ba1a1a; }
+        .text-muted-xs { font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #707882; }
+        .font-black { font-weight: 900; }
+        
+        .anim-element { transition: all 0.7s ease; opacity: 0; transform: translateY(15px); }
+        .anim-element.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- Navegacion -->
+    <header>
+        <nav class="navbar navbar-top navbar-default" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="/">
+                        <img alt="Logo de Argentina.gob.ar" src="https://www.argentina.gob.ar/profiles/argentinagobar/themes/argentinagobar/argentinagobar_theme/logo.svg" height="50">
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="chart-grid"></div>
+        <div class="container" style="position: relative; z-index: 10;">
+            <div style="margin-bottom: 15px; color: #9bcbff;">
+                <span class="text-uppercase" style="font-size: 12px; font-weight: 700; letter-spacing: 1px;">Ministerio de Justicia</span>
+                <span class="fa fa-chevron-right" style="font-size: 10px; margin: 0 5px;"></span>
+                <span class="text-uppercase" style="font-size: 12px; font-weight: 700; letter-spacing: 1px;">Estadísticas SNEEP</span>
+            </div>
+            <h1 class="font-black" style="font-size: 48px; margin-top: 0; margin-bottom: 20px;">Censo Penitenciario Nacional</h1>
+            <p style="font-size: 20px; color: #d0e4ff; max-width: 700px;">El Sistema Nacional de Estadísticas sobre Ejecución de la Pena (SNEEP) recolecta información sobre la población carcelaria en Argentina.</p>
+        </div>
+    </section>
+
+    <!-- Filters Bar -->
+    <section class="glass-header" style="border-bottom: 1px solid #e5e5e5; padding: 20px 0;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="text-muted-xs" for="edit-anio">Periodo Anual</label>
+                        <select class="form-control" id="edit-anio" style="border-radius: 8px; border: 1px solid #c0c7d2; height: 45px;"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="text-muted-xs" for="edit-jurisdiccion">Jurisdicción</label>
+                        <select class="form-control" id="edit-jurisdiccion" style="border-radius: 8px; border: 1px solid #c0c7d2; height: 45px;"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="text-muted-xs" for="edit-delito">Delito</label>
+                        <select class="form-control" id="edit-delito" style="border-radius: 8px; border: 1px solid #c0c7d2; height: 45px;"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container" style="padding-top: 50px; padding-bottom: 50px;">
+        
+        <!-- KPIs High Impact -->
+        <section class="row text-center" style="margin-bottom: 60px;">
+            <div class="col-md-4 anim-element">
+                <div class="pill-card poncho-shadow bg-white p-8" style="padding: 30px;">
+                    <div id="poblacion-card-med" style="min-height: 100px; display: flex; justify-content: center; margin-bottom: 20px;"></div>
+                </div>
+            </div>
+            <div class="col-md-4 anim-element">
+                <div class="pill-card poncho-shadow bg-white p-8" style="padding: 30px;">
+                    <div id="tasa-card-med" style="min-height: 100px; display: flex; justify-content: center; margin-bottom: 20px;"></div>
+                </div>
+            </div>
+            <div class="col-md-4 anim-element">
+                <div class="pill-card poncho-shadow bg-white p-8" style="padding: 30px;">
+                    <div id="capacidad-card-med" style="min-height: 100px; display: flex; justify-content: center; margin-bottom: 20px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Composicion -->
+        <section class="anim-element" style="margin-bottom: 60px;">
+            <h3 class="font-black" style="margin-bottom: 20px;">Composición de la población</h3>
+            <div class="bg-white rounded-3xl poncho-shadow p-10" style="border: 1px solid #e5e5e5; padding: 40px;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div style="text-align:center; padding: 30px; opacity:0.3; color:#0072BB;">
+                            <i class="fa fa-map-o" style="font-size: 80px;"></i>
+                            <p style="font-weight:bold; letter-spacing: 2px; margin-top:15px;">MAPA TEMÁTICO ARGENTINA</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-xs-6"><div id="comp-condenados-card"></div></div>
+                            <div class="col-xs-6"><div id="comp-varones-card"></div></div>
+                            <div class="col-xs-6"><div id="comp-argentinos-card"></div></div>
+                            <div class="col-xs-6"><div id="comp-edad-card"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Situacion Legal -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Situación legal</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Evolución de la condición procesal de los internos a nivel nacional.</p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Condenados</p>
+                    <p class="h2 font-black text-primary" id="legal-value-condenados" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Procesados</p>
+                    <p class="h2 font-black" id="legal-value-procesados" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Otros</p>
+                    <p class="h2 font-black" id="legal-value-otros" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow" style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de situación legal</p>
+                    <div id="tsChartSmall1" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Genero -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Género</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Distribución por identidad de género de la población.</p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Varones</p>
+                    <p class="h2 font-black text-primary" id="genero-value-varones" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Mujeres</p>
+                    <p class="h2 font-black" id="genero-value-mujeres" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Trans</p>
+                    <p class="h2 font-black" id="genero-value-trans" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow" style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de género</p>
+                    <div id="genero-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Edad -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Edad</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Segmentación de la población según franjas etarias.</p>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">18-20 años</p>
+                    <p class="h2 font-black" id="edad-value-18-20" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">21-34 años</p>
+                    <p class="h2 font-black text-primary" id="edad-value-21-34" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">35+ años</p>
+                    <p class="h2 font-black" id="edad-value-35-plus" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow" style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de edad</p>
+                    <div id="edad-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nacionalidad -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Nacionalidad</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Origen nacional o extranjero de los internos.</p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Argentino</p>
+                    <p class="h2 font-black text-primary" id="nac-value-argentino" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Extranjero limítrofe</p>
+                    <p class="h2 font-black" id="nac-value-limitrofe" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Extranjero otros</p>
+                    <p class="h2 font-black" id="nac-value-otros" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow" style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de nacionalidad</p>
+                    <div id="nacionalidad-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nivel Instruccion -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Instrucción</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Máximo nivel educativo alcanzado por la población.</p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Hasta primario</p>
+                    <p class="h2 font-black text-primary" id="inst-value-primario" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Secundario</p>
+                    <p class="h2 font-black" id="inst-value-secundario" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Terciario / Univ.</p>
+                    <p class="h2 font-black" id="inst-value-terciario-uni" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow" style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de nivel de instrucción</p>
+                    <div id="instruccion-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Descarga -->
+        <section class="bg-surface rounded-3xl text-center anim-element poncho-shadow" style="padding: 60px 20px; border: 1px dashed #c0c7d2; margin-bottom: 60px;">
+            <p class="text-muted-xs" style="letter-spacing: 4px; color: #005991; margin-bottom: 20px;">DATOS ABIERTOS</p>
+            <h3 class="font-black" style="margin-bottom: 40px; font-size: 32px;">Accedé a la serie histórica completa y metodología</h3>
+            <div>
+                <button class="btn btn-primary btn-lg" style="border-radius: 50px; padding: 15px 30px; font-weight: bold; margin: 0 10px;">
+                    <i class="fa fa-download"></i> Dataset CSV
+                </button>
+                <button class="btn btn-default btn-lg" style="border-radius: 50px; padding: 15px 30px; font-weight: bold; margin: 0 10px;">
+                    <i class="fa fa-file-text-o"></i> Metodología
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer" style="background-color: #10193a; color: white; padding-top: 60px; padding-bottom: 30px;">
+        <div class="container">
+            <div class="row" style="margin-bottom: 40px;">
+                <div class="col-md-6">
+                    <h2 class="font-black" style="margin-top:0;">Argentina.gob.ar</h2>
+                    <p style="opacity: 0.8; max-width: 400px;">Portal oficial del Estado Argentino. Información, trámites y servicios unificados para el ciudadano.</p>
+                </div>
+                <div class="col-md-6 text-right">
+                    <p class="text-muted-xs" style="color: #9bcbff;">© 2024 MINISTERIO DE JUSTICIA</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts Base -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/datosgobar/series-tiempo-ar-explorer@ts_components_2.6.2/dist/js/components.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    <!-- JS Logica -->
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.anim-element').forEach(el => observer.observe(el));
+    </script>
+    {js_script}
+</body>
+</html>"""
+
+with open('estadisticas-sneep-v2.html', 'w', encoding='utf-8') as f:
+    f.write(html_template.replace('{js_script}', js_script))
+
+print('Done')

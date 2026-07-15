@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SNEEP - Censo Penitenciario Nacional | Argentina.gob.ar</title>
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="./poncho/css/poncho.min.css" rel="stylesheet">
+    <link href="./poncho/css/icono-arg.css" rel="stylesheet">
+
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/datosgobar/series-tiempo-ar-explorer@ts_components_2.6.2/dist/css/components.css"
+        type="text/css">
+
+    <style>
+        body {
+            background-color: #f9f9f9;
+        }
+
+
+        .poncho-shadow {
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .pill-card {
+            border-radius: 2rem;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .pill-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .glass-header {
+            backdrop-filter: blur(8px);
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 40;
+            position: sticky;
+            top: 0;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #005991 0%, #0072b8 100%);
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            opacity: 0.1;
+            background-image: linear-gradient(to right, #f1f1f1 1px, transparent 1px), linear-gradient(to bottom, #f1f1f1 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .pill-kpi {
+            border-radius: 1.5rem;
+            background: white;
+            padding: 20px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .rounded-3xl {
+            border-radius: 1.5rem;
+        }
+
+        .border-l-primary {
+            border-left: 4px solid #005991 !important;
+        }
+
+        .text-primary {
+            color: #005991;
+        }
+
+        .bg-primary {
+            background-color: #005991;
+        }
+
+        .bg-surface {
+            background-color: #f3f3f3;
+        }
+
+        .text-success {
+            color: #2E7D32;
+        }
+
+        .text-error {
+            color: #ba1a1a;
+        }
+
+        .text-muted-xs {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #707882;
+        }
+
+        .font-black {
+            font-weight: 900;
+        }
+
+        .kpi-num {
+            font-size: 2rem;
+            line-height: 1.1;
+            font-family: inherit;
+        }
+
+        .anim-element {
+            transition: all 0.7s ease;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        .anim-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Ajustes responsivos para mobile */
+        @media (max-width: 767px) {
+            section {
+                margin-bottom: 30px !important;
+            }
+
+            .pill-card {
+                padding: 20px !important;
+            }
+
+            .bg-white.rounded-3xl.p-10 {
+                padding: 20px !important;
+            }
+
+            .col-md-6,
+            .col-sm-6,
+            .col-md-3,
+            .col-md-7,
+            .col-md-5,
+            .col-xs-12 {
+                margin-bottom: 20px !important;
+            }
+
+            main.container {
+                padding-top: 30px !important;
+                padding-bottom: 30px !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navegacion -->
+    <header>
+        <nav class="navbar navbar-top navbar-default border-bottom-amarillo">
+            <div class="container">
+                <div>
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="https://www.argentina.gob.ar/" id="navbar-brand"
+                            aria-label="Argentina.gob.ar Presidencia de la Nación">
+                            <img src="https://www.argentina.gob.ar/profiles/argentinagobar/themes/argentinagobar/argentinagobar_theme/logo_argentina-azul.svg"
+                                alt="Argentina.gob.ar" height="50" width="254">
+                        </a>
+                        <a class="btn btn-mi-argentina btn-login visible-xs bg-miarg-azul"
+                            href="https://mi.argentina.gob.ar" title="Ingresar a Mi Argentina">
+                            <i class="icono-arg-mi-argentina text-white"></i><span class="sr-only">Ir a Mi
+                                Argentina</span>
+                        </a>
+                        <button class="btn btn-mi-argentina btn-login visible-xs" aria-labelledby="edit-keys"><span
+                                class="fa fa-search fa-fw"></span><span class="sr-only">Buscar</span></button>
+                    </div>
+                    <div class="nav navbar-nav navbar-right hidden-xs">
+                        <button class="btn btn-link btn-search-reset visible-xs"><i class="fa fa-times"><span
+                                    class="sr-only">Cerrar el buscador</span></i></button>
+                        <div id="cd-login">
+                            <a href="https://mi.argentina.gob.ar/" id="btn-mi-argentina"
+                                class="btn hidden-xs p-l-1 btn-login bg-miarg-azul"
+                                aria-label="Ingresar a Mi Argentina">
+                                <i class="fa-3x fa icono-arg-mi-argentina-extended text-white p-t-0"><span
+                                        class="sr-only">Mi Argentina</span></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="bg-primary">
+        <div class="jumbotron">
+            <div class="jumbotron_bar">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <ol class="breadcrumb device-breadcrumb" itemscope
+                                itemtype="https://schema.org/BreadcrumbList" role="list" aria-label="Migas de pan">
+                                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"
+                                    class="device-breadcrumb__hidden-item">
+                                    <a itemprop="item" href="https://www.argentina.gob.ar/"><span
+                                            itemprop="name">Inicio</span></a>
+                                    <meta itemprop="position" content="1">
+                                </li>
+                                <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem"
+                                    class="device-breadcrumb__last-visible-item">
+                                    <a itemprop="item" href="https://www.argentina.gob.ar/justicia"><span
+                                            itemprop="name">Ministerio de Justicia</span></a>
+                                    <meta itemprop="position" content="2">
+                                </li>
+                                <li class="active device-breadcrumb__hidden-item" itemprop="itemListElement" itemscope
+                                    itemtype="https://schema.org/ListItem" aria-current="page">
+                                    <span itemprop="name">Estadísticas SNEEP</span>
+                                    <meta itemprop="position" content="3">
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 m-t-2 m-b-3">
+                    <h1 class="m-b-05">Censo Penitenciario Nacional</h1>
+                    <p>El Sistema Nacional de Estadísticas sobre Ejecución de la Pena (SNEEP) recolecta información
+                        sobre la población carcelaria en Argentina.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Filters Bar -->
+    <section class="glass-header" style="border-bottom: 1px solid #e5e5e5; padding: 20px 0;">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="text-muted-xs" for="edit-anio">Periodo Anual</label>
+                        <select class="form-control" id="edit-anio"
+                            style="border-radius: 8px; border: 1px solid #c0c7d2; height: 45px;"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="text-muted-xs" for="edit-jurisdiccion">Jurisdicción</label>
+                        <select class="form-control" id="edit-jurisdiccion"
+                            style="border-radius: 8px; border: 1px solid #c0c7d2; height: 45px;"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="text-muted-xs" for="edit-delito">Delito</label>
+                        <select class="form-control" id="edit-delito"
+                            style="border-radius: 8px; border: 1px solid #c0c7d2; height: 45px;"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container" style="padding-top: 50px; padding-bottom: 50px;">
+
+        <!-- KPIs High Impact -->
+        <section class="row text-center" style="margin-bottom: 60px;">
+            <div class="col-md-6 anim-element">
+                <div class="pill-card poncho-shadow bg-white"
+                    style="border: 1px solid #e5e5e5; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 2rem;">
+                    <span
+                        style="font-size: 11px; font-weight: 700; color: #707882; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 20px; display: block;">Población
+                        Total</span>
+                    <div style="margin-bottom: 20px;">
+                        <span id="kpi-poblacion-val" class="text-primary font-black"
+                            style="font-size: 64px; letter-spacing: -2px; line-height: 1;">--</span>
+                    </div>
+                    <div id="kpi-poblacion-var-container"
+                        style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background-color: rgba(46, 125, 50, 0.1); padding: 6px 16px; border-radius: 50px; margin-bottom: 30px; visibility: hidden;">
+                        <i id="kpi-poblacion-var-icon" class="fa fa-arrow-up"
+                            style="font-size: 16px; color: #2e7d32;"></i>
+                        <span id="kpi-poblacion-var-val"
+                            style="color: #2e7d32; font-weight: 700; font-size: 14px;">--</span>
+                        <span style="color: #707882; font-weight: 500; font-size: 14px;">vs año ant.</span>
+                    </div>
+                    <div style="width: 100%; border-top: 1px dashed #e5e5e5; padding-top: 15px;">
+                        <p
+                            style="font-size: 10px; color: #707882; font-weight: 500; margin: 0; text-transform: uppercase;">
+                            SNEEP - MINISTERIO DE JUSTICIA</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 anim-element">
+                <div class="pill-card poncho-shadow bg-white"
+                    style="border: 1px solid #e5e5e5; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 2rem;">
+                    <span
+                        style="font-size: 11px; font-weight: 700; color: #707882; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 20px; display: block;">Tasa
+                        cada 100k hab.</span>
+                    <div style="margin-bottom: 20px;">
+                        <span id="kpi-tasa-val" class="font-black"
+                            style="font-size: 64px; letter-spacing: -2px; line-height: 1; color: #0072BB;">--</span>
+                    </div>
+                    <div id="kpi-tasa-var-container"
+                        style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background-color: rgba(46, 125, 50, 0.1); padding: 6px 16px; border-radius: 50px; margin-bottom: 30px; visibility: hidden;">
+                        <i id="kpi-tasa-var-icon" class="fa fa-arrow-up" style="font-size: 16px; color: #2e7d32;"></i>
+                        <span id="kpi-tasa-var-val" style="color: #2e7d32; font-weight: 700; font-size: 14px;">--</span>
+                        <span style="color: #707882; font-weight: 500; font-size: 14px;">vs año ant.</span>
+                    </div>
+                    <div style="width: 100%; border-top: 1px dashed #e5e5e5; padding-top: 15px;">
+                        <p
+                            style="font-size: 10px; color: #707882; font-weight: 500; margin: 0; text-transform: uppercase;">
+                            INDICADOR DE INCIDENCIA NACIONAL</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Composicion -->
+        <section class="anim-element" style="margin-bottom: 60px;">
+            <h3 class="font-black" style="margin-bottom: 20px;">Composición de la población</h3>
+            <div class="bg-white rounded-3xl poncho-shadow p-10" style="border: 1px solid #e5e5e5; padding: 40px;">
+                <div class="row">
+                    <div class="col-md-5">
+                        <div
+                            style="background-color: #f8f9fa; border-radius: 20px; padding: 20px; text-align: center; border: 1px solid #e5e5e5; height: 100%; min-height: 250px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                            <div style="opacity: 0.4; margin-bottom: 15px; position: relative;">
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgK_PlKODImPqZ-g1VJ_9_0ZVmQ7EBODy6g2sGGit4O4eCO6cRcDY8wmX4tzBxcwW0kMgQgakihYIxTd_PrR7q_NP--lEvJBCwUsMJpK0xkQ_uMcb4q3RyjKuV_1iW1NL2c9Sw4phdI92MeH5DoWJYUDVRHhzg9sSHAD9s8G2TG056OtxU0XyvXhWcFKN8G_enCUEjfwRgaylv8ZSEctSyePDH3EeZXKx4saTTxtsQAI4y6TKO-90AeuVYPWGoBh_Sb_WEH-Vm_EfU"
+                                    alt="Mapa de Argentina"
+                                    style="max-width: 100%; max-height: 180px; filter: grayscale(100%);">
+                                <div
+                                    style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center;">
+                                    <p
+                                        style="font-weight: 700; letter-spacing: 2px; font-size: 11px; text-transform: uppercase; color: #444; margin: 0; text-align: center;">
+                                        MAPA TEMÁTICO<br>ARGENTINA</p>
+                                </div>
+                            </div>
+                            <span
+                                style="background: white; border: 1px solid #e5e5e5; padding: 8px 16px; border-radius: 20px; font-size: 10px; font-weight: 700; color: #005991; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-top: 10px;">DISTRIBUCIÓN
+                                FEDERAL</span>
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="row">
+                            <div class="col-sm-6" style="margin-bottom: 20px;">
+                                <div class="pill-card poncho-shadow bg-white"
+                                    style="border: 1px solid #e5e5e5; padding: 20px; height: 100%; border-radius: 1.5rem; transition: all 0.3s ease;">
+                                    <p class="text-muted-xs" style="margin-bottom: 5px;">Situación: Condenados</p>
+                                    <p class="font-black text-primary"
+                                        style="font-size: 36px; margin: 0; line-height: 1;" id="comp-condenados-pct">--
+                                        %</p>
+                                    <p class="text-muted-xs"
+                                        style="margin-top: 10px; font-size: 10px; text-transform: none; font-weight: 500;"
+                                        id="comp-condenados-abs">-- personas registradas</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" style="margin-bottom: 20px;">
+                                <div class="pill-card poncho-shadow bg-white"
+                                    style="border: 1px solid #e5e5e5; padding: 20px; height: 100%; border-radius: 1.5rem; transition: all 0.3s ease;">
+                                    <p class="text-muted-xs" style="margin-bottom: 5px;">Género: Varones</p>
+                                    <p class="font-black text-success"
+                                        style="font-size: 36px; margin: 0; line-height: 1;" id="comp-varones-pct">-- %
+                                    </p>
+                                    <p class="text-muted-xs"
+                                        style="margin-top: 10px; font-size: 10px; text-transform: none; font-weight: 500;"
+                                        id="comp-varones-abs">-- varones registrados</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" style="margin-bottom: 20px;">
+                                <div class="pill-card poncho-shadow bg-white"
+                                    style="border: 1px solid #e5e5e5; padding: 20px; height: 100%; border-radius: 1.5rem; transition: all 0.3s ease;">
+                                    <p class="text-muted-xs" style="margin-bottom: 5px;">Origen: Argentinos</p>
+                                    <p class="font-black"
+                                        style="font-size: 36px; margin: 0; line-height: 1; color: #212529;"
+                                        id="comp-argentinos-pct">-- %</p>
+                                    <p class="text-muted-xs"
+                                        style="margin-top: 10px; font-size: 10px; text-transform: none; font-weight: 500;"
+                                        id="comp-argentinos-abs">-- personas</p>
+                                </div>
+                            </div>
+                            <div class="col-sm-6" style="margin-bottom: 20px;">
+                                <div class="pill-card poncho-shadow bg-white"
+                                    style="border: 1px solid #e5e5e5; padding: 20px; height: 100%; border-radius: 1.5rem; transition: all 0.3s ease;">
+                                    <p class="text-muted-xs" style="margin-bottom: 5px;">Edad: Menores de 35</p>
+                                    <p class="font-black"
+                                        style="font-size: 36px; margin: 0; line-height: 1; color: #ba1a1a;"
+                                        id="comp-edad-pct">-- %</p>
+                                    <p class="text-muted-xs"
+                                        style="margin-top: 10px; font-size: 10px; text-transform: none; font-weight: 500;"
+                                        id="comp-edad-abs">Población joven/adulta</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <button class="btn btn-primary btn-block pill-card"
+                                style="padding: 15px; font-weight: bold; border-radius: 2rem; background-color: #005991; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fa fa-bar-chart" style="font-size: 20px;"></i> Ver
+                                reporte completo por provincia
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Situacion Legal -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Situación legal</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Evolución de la condición procesal de los internos a
+                    nivel nacional.</p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Condenados</p>
+                    <p class="kpi-num font-black text-primary" id="legal-value-condenados" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Procesados</p>
+                    <p class="kpi-num font-black" id="legal-value-procesados" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Otros</p>
+                    <p class="kpi-num font-black" id="legal-value-otros" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow"
+                    style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de situación legal</p>
+                    <div id="tsChartSmall1" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Genero -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Género</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Distribución por identidad de género de la población.
+                </p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Varones</p>
+                    <p class="kpi-num font-black text-primary" id="genero-value-varones" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Mujeres</p>
+                    <p class="kpi-num font-black" id="genero-value-mujeres" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Trans</p>
+                    <p class="kpi-num font-black" id="genero-value-trans" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow"
+                    style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de género</p>
+                    <div id="genero-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Edad -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Edad</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Segmentación de la población según franjas etarias.
+                </p>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">18-20 años</p>
+                    <p class="kpi-num font-black" id="edad-value-18-20" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">21-34 años</p>
+                    <p class="kpi-num font-black text-primary" id="edad-value-21-34" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">35+ años</p>
+                    <p class="kpi-num font-black" id="edad-value-35-plus" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow"
+                    style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de edad</p>
+                    <div id="edad-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nacionalidad -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Nacionalidad</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Origen nacional o extranjero de los internos.</p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Argentino</p>
+                    <p class="kpi-num font-black text-primary" id="nac-value-argentino" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Extranjero limítrofe</p>
+                    <p class="kpi-num font-black" id="nac-value-limitrofe" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Extranjero otros</p>
+                    <p class="kpi-num font-black" id="nac-value-otros" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow"
+                    style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de nacionalidad</p>
+                    <div id="nacionalidad-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Nivel Instruccion -->
+        <section class="row anim-element" style="margin-bottom: 60px;">
+            <div class="col-md-3">
+                <h3 class="font-black">Instrucción</h3>
+                <p class="text-muted" style="margin-bottom: 20px;">Máximo nivel educativo alcanzado por la población.
+                </p>
+                <div class="pill-kpi poncho-shadow border-l-primary" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Hasta primario</p>
+                    <p class="kpi-num font-black text-primary" id="inst-value-primario" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi" style="margin-bottom: 15px;">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Secundario</p>
+                    <p class="kpi-num font-black" id="inst-value-secundario" style="margin:0;">-- %</p>
+                </div>
+                <div class="pill-kpi">
+                    <p class="text-muted-xs" style="margin-bottom: 5px;">Terciario / Univ.</p>
+                    <p class="kpi-num font-black" id="inst-value-terciario-uni" style="margin:0;">-- %</p>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="bg-white rounded-3xl poncho-shadow"
+                    style="border: 1px solid #e5e5e5; height: 100%; padding: 40px;">
+                    <p class="text-muted-xs" style="margin-bottom: 20px;">Serie histórica de nivel de instrucción</p>
+                    <div id="instruccion-chart" style="width: 100%; min-height: 350px;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Descarga -->
+        <section class="bg-surface rounded-3xl text-center anim-element poncho-shadow"
+            style="padding: 60px 20px; border: 1px dashed #c0c7d2; margin-bottom: 60px;">
+            <p class="text-muted-xs" style="letter-spacing: 4px; color: #005991; margin-bottom: 20px;">DATOS ABIERTOS
+            </p>
+            <h3 class="font-black" style="margin-bottom: 40px; font-size: 32px;">Accedé a la serie histórica completa y
+                metodología</h3>
+            <div>
+                <button class="btn btn-primary btn-lg"
+                    style="border-radius: 50px; padding: 15px 30px; font-weight: bold; margin: 0 10px;">
+                    <i class="fa fa-download"></i> Dataset CSV
+                </button>
+                <button class="btn btn-default btn-lg"
+                    style="border-radius: 50px; padding: 15px 30px; font-weight: bold; margin: 0 10px;">
+                    <i class="fa fa-file-text-o"></i> Metodología
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Trámites</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/turnos">Turnos</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/tad">Trámites a distancia</a></li>
+                            <li class="last leaf"><a
+                                    href="https://www.argentina.gob.ar/miargentina/mesadeayuda">Atención a la
+                                    ciudadanía</a></li>
+                        </ul>
+                    </section>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Acerca de la República Argentina</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/pais">Nuestro país</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/normativa">Leyes argentinas</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/organismos">Organismos</a></li>
+                            <li class="last leaf"><a
+                                    href="https://www.argentina.gob.ar/desregulacion/mapa-del-estado">Mapa del
+                                    Estado</a></li>
+                        </ul>
+                    </section>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Acerca de Argentina.gob.ar</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/acerca">Acerca de este
+                                    sitio</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/terminos-y-condiciones">Términos y
+                                    condiciones</a></li>
+                            <li class="last leaf"><a href="https://www.argentina.gob.ar/sugerencias">Sugerencias</a>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid border-top-amarillo">
+            <div class="row sub-footer">
+                <div class="container">
+                    <div class="col-sm-6 m-y-1 p-x-0"></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts Base -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/gh/datosgobar/series-tiempo-ar-explorer@ts_components_2.6.2/dist/js/components.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    <!-- JS Logica -->
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.anim-element').forEach(el => observer.observe(el));
+    </script>
+    <script>
+        (function () {
+            var RAW = {
+                "anios": ["2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+                "filtros": {
+                    "jurisdicciones": {
+                        "argentina": { "label": "Argentina (Total Nacional)", "factor": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
+                        "spf": { "label": "Servicio Penitenciario Federal", "factor": [0.065, 0.067, 0.068, 0.066, 0.069, 0.070, 0.072, 0.074, 0.076, 0.078, 0.080, 0.082, 0.085, 0.088, 0.091, 0.094, 0.097, 0.100, 0.103, 0.106, 0.109, 0.112, 0.115] },
+                        "pba": { "label": "Provincia de Buenos Aires", "factor": [0.32, 0.31, 0.30, 0.31, 0.30, 0.29, 0.29, 0.28, 0.28, 0.28, 0.27, 0.27, 0.27, 0.26, 0.26, 0.26, 0.25, 0.25, 0.25, 0.24, 0.24, 0.24, 0.23] },
+                        "caba": { "label": "Ciudad Autónoma de Buenos Aires", "factor": [0.035, 0.036, 0.037, 0.036, 0.037, 0.038, 0.038, 0.039, 0.039, 0.040, 0.040, 0.041, 0.041, 0.042, 0.042, 0.043, 0.043, 0.044, 0.044, 0.045, 0.045, 0.046, 0.046] },
+                        "cordoba": { "label": "Córdoba", "factor": [0.060, 0.061, 0.062, 0.061, 0.062, 0.063, 0.063, 0.064, 0.064, 0.065, 0.065, 0.066, 0.066, 0.067, 0.067, 0.068, 0.068, 0.069, 0.069, 0.070, 0.070, 0.071, 0.071] },
+                        "santafe": { "label": "Santa Fe", "factor": [0.055, 0.056, 0.057, 0.056, 0.057, 0.058, 0.058, 0.059, 0.059, 0.060, 0.060, 0.061, 0.061, 0.062, 0.062, 0.063, 0.063, 0.064, 0.064, 0.065, 0.065, 0.066, 0.066] },
+                        "resto": { "label": "Resto del país", "factor": [0.465, 0.470, 0.476, 0.471, 0.475, 0.481, 0.477, 0.476, 0.473, 0.471, 0.476, 0.472, 0.467, 0.475, 0.473, 0.466, 0.463, 0.457, 0.451, 0.444, 0.437, 0.429, 0.426] }
+                    },
+                    "delitos": {
+                        "todos": { "label": "Todos los delitos", "factor": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
+                        "homicidios": { "label": "Homicidios dolosos", "factor": [0.028, 0.027, 0.026, 0.029, 0.027, 0.026, 0.025, 0.026, 0.025, 0.024, 0.024, 0.025, 0.025, 0.026, 0.026, 0.027, 0.027, 0.028, 0.028, 0.027, 0.027, 0.026, 0.026] },
+                        "robo": { "label": "Robo", "factor": [0.18, 0.19, 0.19, 0.20, 0.19, 0.19, 0.18, 0.18, 0.18, 0.17, 0.17, 0.17, 0.17, 0.16, 0.16, 0.16, 0.16, 0.15, 0.15, 0.15, 0.15, 0.14, 0.14] },
+                        "trafico": { "label": "Tráfico de drogas", "factor": [0.12, 0.12, 0.13, 0.12, 0.13, 0.13, 0.14, 0.14, 0.14, 0.15, 0.15, 0.15, 0.15, 0.16, 0.16, 0.16, 0.16, 0.17, 0.17, 0.17, 0.17, 0.18, 0.18] },
+                        "estafas": { "label": "Estafas y otros", "factor": [0.08, 0.08, 0.07, 0.08, 0.07, 0.07, 0.08, 0.08, 0.08, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10] },
+                        "resto_delitos": { "label": "Resto de delitos", "factor": [0.572, 0.573, 0.574, 0.561, 0.583, 0.585, 0.587, 0.572, 0.573, 0.556, 0.557, 0.554, 0.556, 0.545, 0.544, 0.542, 0.539, 0.520, 0.510, 0.511, 0.503, 0.514, 0.504] }
+                    }
+                },
+                "series": {
+                    "total": [44969, 42687, 53029, 43689, 50428, 50980, 53448, 54758, 58917, 60106, 61192, 64109, 68407, 71464, 76261, 85283, 94883, 100634, 94944, 101267, 105053, 111967, 120700],
+                    "condenados": [17756, 16803, 21054, 18906, 20537, 20196, 21333, 23590, 27320, 29095, 29902, 31289, 32940, 34992, 39373, 46405, 50628, 56270, 52035, 55933, 61291, 67352, 72894],
+                    "procesados": [26477, 25117, 31043, 24232, 29052, 29972, 31389, 30409, 30832, 30305, 30643, 31785, 34613, 35779, 36374, 38315, 43597, 43752, 42348, 44687, 43191, 43459, 46828],
+                    "otros": [736, 767, 932, 551, 839, 812, 726, 759, 765, 706, 647, 1035, 854, 693, 514, 563, 658, 612, 561, 647, 571, 1156, 978],
+                    "varones": [42567, 40393, 50408, 41517, 47637, 48176, 50641, 52125, 56198, 57195, 58338, 61270, 65418, 68468, 73014, 81553, 90375, 96108, 91254, 96617, 100607, 107116, 115281],
+                    "mujeres": [2402, 2294, 2621, 2172, 2791, 2804, 2807, 2633, 2719, 2911, 2854, 2839, 2989, 2963, 3184, 3602, 4362, 4413, 3568, 4476, 4256, 4642, 5213],
+                    "trans": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 15, 20, 33, 63, 128, 146, 113, 122, 174, 190, 206],
+                    "edad_18_20": [4496, 4268, 5302, 4368, 5042, 5098, 5344, 5475, 5891, 6010, 6119, 6410, 6840, 7146, 7626, 8528, 9488, 10063, 9494, 10126, 10505, 11196, 12070],
+                    "edad_21_34": [22484, 21343, 26514, 21844, 25214, 25490, 26724, 27379, 29458, 30053, 30596, 32054, 34203, 35732, 38130, 42641, 47441, 50317, 47472, 50633, 52526, 55983, 60350],
+                    "edad_35_plus": [17989, 17076, 21213, 17477, 20172, 20392, 21380, 21904, 23568, 24043, 24477, 25645, 27364, 28586, 30505, 34114, 37954, 40254, 37978, 40508, 42022, 44788, 48280],
+                    "nacionalidad_argentino": [40472, 38418, 47726, 39320, 45385, 45882, 48103, 49282, 53025, 54095, 55072, 57698, 61566, 64317, 68634, 76754, 85394, 90570, 85449, 91140, 94547, 100770, 108630],
+                    "nacionalidad_limitrofe": [3597, 3414, 4242, 3495, 4034, 4078, 4275, 4380, 4713, 4808, 4895, 5128, 5472, 5717, 6100, 6822, 7590, 8050, 7595, 8101, 8404, 8957, 9656],
+                    "nacionalidad_otros": [899, 853, 1060, 873, 1008, 1019, 1068, 1095, 1178, 1202, 1223, 1282, 1368, 1429, 1525, 1705, 1897, 2012, 1898, 2025, 2101, 2239, 2414],
+                    "instruccion_primario": [26981, 25612, 31817, 26213, 30256, 30588, 32068, 32854, 35350, 36063, 36715, 38465, 41044, 42878, 45756, 51169, 56929, 60380, 56966, 60760, 63031, 67180, 72420],
+                    "instruccion_secundario": [13490, 12806, 15908, 13106, 15128, 15294, 16034, 16427, 17675, 18031, 18357, 19232, 20522, 21439, 22878, 25584, 28464, 30190, 28483, 30380, 31515, 33590, 36210],
+                    "instruccion_terciario_uni": [4496, 4268, 5302, 4368, 5042, 5098, 5344, 5475, 5891, 6010, 6119, 6410, 6840, 7146, 7626, 8528, 9488, 10063, 9494, 10126, 10505, 11196, 12070],
+                    "tasa_cada_100mil": [118.9, 111.5, 136.8, 111.7, 127.8, 128.2, 133.3, 135.5, 144.5, 146.3, 148.1, 154.2, 163.5, 169.6, 179.7, 199.5, 220.3, 231.8, 217.3, 230.2, 237.1, 250.6, 268.0],
+                    "capacidad_operativa": [52000, 52500, 53000, 53500, 54000, 55000, 56000, 57000, 58500, 60000, 62000, 64000, 66000, 68000, 70000, 72000, 74000, 76000, 78000, 80000, 82000, 85000, 88000],
+                    "reincidencia": [28.2, 27.8, 29.1, 26.5, 27.3, 26.9, 27.5, 28.0, 28.4, 29.0, 29.5, 30.1, 30.8, 31.2, 31.5, 32.0, 32.4, 33.0, 31.5, 30.8, 30.2, 29.5, 28.8]
+                }
+            };
+
+            var PALETTE = {
+                primary: '#0072BB',
+                secondary: '#2e7d32',
+                tertiary: '#F44336',
+                quaternary: '#FF9800',
+                quinary: '#9C27B0',
+                gray: '#607D8B'
+            };
+            var COLORS = [PALETTE.primary, PALETTE.secondary, PALETTE.tertiary, PALETTE.quaternary, PALETTE.quinary, PALETTE.gray];
+
+            Highcharts.setOptions({
+                lang: {
+                    months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    thousandsSep: '.',
+                    decimalPoint: ','
+                },
+                chart: {
+                    style: { fontFamily: '"Encode Sans", sans-serif' },
+                    backgroundColor: 'transparent'
+                }
+            });
+
+            function $(id) { return document.getElementById(id); }
+            function fmt(n) { return n.toLocaleString('es-AR'); }
+            function pct(n) { return n.toFixed(1).replace('.', ',') + ' %'; }
+
+            /* ── Filtrado de datos ── */
+            function getFilteredSeries() {
+                var jurKey = $('edit-jurisdiccion').value || 'argentina';
+                var delKey = $('edit-delito').value || 'todos';
+                var jur = RAW.filtros.jurisdicciones[jurKey] || RAW.filtros.jurisdicciones.argentina;
+                var del = RAW.filtros.delitos[delKey] || RAW.filtros.delitos.todos;
+                var out = {};
+                var seriesNum = ['total', 'condenados', 'procesados', 'otros', 'varones', 'mujeres', 'trans',
+                    'edad_18_20', 'edad_21_34', 'edad_35_plus',
+                    'nacionalidad_argentino', 'nacionalidad_limitrofe', 'nacionalidad_otros',
+                    'instruccion_primario', 'instruccion_secundario', 'instruccion_terciario_uni'];
+                for (var s = 0; s < seriesNum.length; s++) {
+                    var key = seriesNum[s];
+                    var base = RAW.series[key];
+                    var arr = [];
+                    for (var y = 0; y < base.length; y++) {
+                        arr.push(Math.round(base[y] * jur.factor[y] * del.factor[y]));
+                    }
+                    out[key] = arr;
+                }
+                out.tasa_cada_100mil = [];
+                for (var y = 0; y < RAW.series.tasa_cada_100mil.length; y++) {
+                    out.tasa_cada_100mil.push(+(RAW.series.tasa_cada_100mil[y] * jur.factor[y] * del.factor[y]).toFixed(1));
+                }
+                out.capacidad_operativa = [];
+                for (var y = 0; y < RAW.series.capacidad_operativa.length; y++) {
+                    out.capacidad_operativa.push(Math.round(RAW.series.capacidad_operativa[y] * jur.factor[y]));
+                }
+                out.reincidencia = [];
+                for (var y = 0; y < RAW.series.reincidencia.length; y++) {
+                    out.reincidencia.push(+(RAW.series.reincidencia[y] + (Math.random() - 0.5) * 2).toFixed(1));
+                }
+                return out;
+            }
+
+            /* ── Cards con clases TSComponents (estilizadas por components.css) ── */
+            function renderTSCard(containerId, opts) {
+                var container = $(containerId);
+                if (!container) return;
+                var s = getFilteredSeries();
+                var anios = RAW.anios.map(function (a) { return parseInt(a, 10); });
+                var seriesData = (s[opts.serieKey] || []).map(function (v, i) { return [anios[i], v]; });
+                var currentVal = (s[opts.serieKey] || [])[RAW.anios.indexOf(String(opts.year))];
+                if (currentVal === undefined) return;
+                var color = opts.color || PALETTE.primary;
+                var formattedVal = opts.format === 'decimal' ? currentVal.toFixed(1).replace('.', ',') : currentVal.toLocaleString('es-AR');
+                var prevIdx = RAW.anios.indexOf(String(opts.year)) - 1;
+                var prevVal = prevIdx >= 0 ? (s[opts.serieKey] || [])[prevIdx] : null;
+                var variacion = '';
+                if (prevVal && prevVal > 0) {
+                    var diff = ((currentVal - prevVal) / prevVal * 100);
+                    var arrow = diff >= 0 ? '▲' : '▼';
+                    var diffColor = diff >= 0 ? '#2e7d32' : '#ba1a1a';
+                    variacion = '<span style="color:' + diffColor + ';font-size:13px;font-weight:600;">' + arrow + ' ' + Math.abs(diff).toFixed(1).replace('.', ',') + '%</span>';
+                }
+                container.innerHTML = '<div class="card no-graph full" style="border-top-color:' + color + '">'
+                    + '<div class="c-head"><p class="c-title">' + opts.title + '</p><p class="c-span">' + opts.year + '</p></div>'
+                    + '<div class="c-data"><p class="c-main" style="color:' + color + '">' + formattedVal + '</p></div>'
+                    + '<p class="c-units">' + (opts.units || '') + ' ' + variacion + '</p>'
+                    + '<div id="' + containerId + '-spark" style="height:60px;width:100%;"></div>'
+                    + '<p class="c-span bt c-source">Fuente: SNEEP – Ministerio de Justicia de la Nación</p>'
+                    + '</div>';
+                if (typeof Highcharts !== 'undefined') {
+                    Highcharts.chart(containerId + '-spark', {
+                        chart: { type: 'area', backgroundColor: 'transparent', margin: [5, 0, 5, 0] },
+                        title: { text: null },
+                        xAxis: { visible: false },
+                        yAxis: { visible: false },
+                        tooltip: { enabled: false },
+                        legend: { enabled: false },
+                        credits: { enabled: false },
+                        exporting: { enabled: false },
+                        plotOptions: { area: { fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, Highcharts.color(color).setOpacity(0.3).get('rgba')], [1, Highcharts.color(color).setOpacity(0.05).get('rgba')]] }, lineWidth: 2, marker: { enabled: false } } },
+                        series: [{ data: seriesData, color: color }]
+                    });
+                }
+            }
+
+            function renderTSMinimalCard(containerId, opts) {
+                var container = $(containerId);
+                if (!container) return;
+                var color = opts.color || PALETTE.primary;
+
+                /* Si la tarjeta ya existe (ej. al cambiar filtros), simplemente actualizamos los datos
+                   síncronamente para que sea instantáneo y no haya que llamar a la API de nuevo. */
+                var existingCard = container.querySelector('.card');
+                if (existingCard) {
+                    var mainEl = existingCard.querySelector('.c-main');
+                    if (mainEl) {
+                        mainEl.textContent = opts.value;
+                        mainEl.style.color = color;
+                    }
+                    var unitsEl = existingCard.querySelector('.c-units');
+                    if (unitsEl) unitsEl.textContent = opts.exactValue ? (opts.exactValue + ' personas') : '';
+                    var sourceEl = existingCard.querySelector('.c-source');
+                    if (sourceEl) sourceEl.textContent = 'Año ' + opts.year;
+                    var titleEl = existingCard.querySelector('.c-title');
+                    if (titleEl) titleEl.textContent = opts.label;
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                if (typeof TSComponents !== 'undefined' && TSComponents.Card) {
+                    /* Ocultamos temporalmente para evitar el parpadeo del dato de la API */
+                    container.style.visibility = 'hidden';
+
+                    TSComponents.Card.render(containerId, {
+                        serieId: 'tn_arg', /* Serie válida para que funcione el render */
+                        explicitSign: false,
+                        color: color,
+                        links: 'none',
+                        hasChart: 'none',
+                        title: opts.label
+                    });
+
+                    /* Interceptamos cuando la API termine de renderizar su DOM */
+                    var checkInterval = setInterval(function () {
+                        var mainEl = container.querySelector('.c-main');
+                        if (mainEl && mainEl.textContent.trim() !== '') {
+                            /* Sobreescribimos con nuestro dato local */
+                            mainEl.textContent = opts.value;
+                            var unitsEl = container.querySelector('.c-units');
+                            if (unitsEl) unitsEl.textContent = opts.exactValue ? (opts.exactValue + ' personas') : '';
+
+                            var sourceEl = container.querySelector('.c-source');
+                            if (sourceEl) sourceEl.textContent = 'Año ' + opts.year;
+                            var titleEl = container.querySelector('.c-title');
+                            if (titleEl) titleEl.textContent = opts.label;
+
+                            /* Mostramos la tarjeta terminada */
+                            container.style.visibility = 'visible';
+                            clearInterval(checkInterval);
+                        }
+                    }, 50);
+
+                    /* Fallback de seguridad por si la API falla */
+                    setTimeout(function () {
+                        clearInterval(checkInterval);
+                        container.style.visibility = 'visible';
+                    }, 3000);
+                }
+            }
+
+            /* ── Highcharts base config ── */
+            function tsBaseConfig(overrides) {
+                var base = {
+                    chart: { zoomType: 'x', backgroundColor: 'transparent' },
+                    title: { text: null },
+                    xAxis: {
+                        type: 'linear', title: { text: null },
+                        labels: { format: '{value}', style: { color: '#888', fontSize: '11px' } },
+                        crosshair: { width: 1, color: '#ccc', dashStyle: 'Dot' },
+                        gridLineWidth: 0, tickWidth: 0, lineColor: '#ddd'
+                    },
+                    yAxis: {
+                        title: { text: null },
+                        labels: { style: { color: '#888', fontSize: '11px' }, formatter: function () { return this.value >= 1000 ? (this.value / 1000).toFixed(0) + 'k' : this.value; } },
+                        gridLineColor: '#f0f0f0', gridLineDashStyle: 'Dot'
+                    },
+                    tooltip: {
+                        shared: true, useHTML: true, backgroundColor: '#fff', borderColor: '#ddd', borderRadius: 8,
+                        shadow: { color: 'rgba(0,0,0,0.08)', offsetX: 0, offsetY: 2, width: 8 },
+                        style: { fontSize: '12px' },
+                        headerFormat: '<div style="font-weight:700;margin-bottom:6px;color:#333;">Año {point.x}</div>',
+                        pointFormat: '<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:{series.color};"></span><span style="color:#666;">{series.name}:</span> <strong style="color:#333;">{point.y:,.0f}</strong></div>'
+                    },
+                    legend: {
+                        align: 'center', verticalAlign: 'bottom', layout: 'horizontal',
+                        itemStyle: { fontSize: '12px', fontWeight: '600', color: '#555' }, symbolRadius: 3
+                    },
+                    credits: { enabled: false },
+                    exporting: { enabled: false }
+                };
+                for (var k in overrides) {
+                    if (typeof overrides[k] === 'object' && !Array.isArray(overrides[k]) && base[k]) {
+                        for (var kk in overrides[k]) base[k][kk] = overrides[k][kk];
+                    } else { base[k] = overrides[k]; }
+                }
+                return base;
+            }
+
+            function makeSeriesData(key) {
+                var s = getFilteredSeries();
+                var anios = RAW.anios.map(function (a) { return parseInt(a, 10); });
+                return (s[key] || []).map(function (v, i) { return [anios[i], v]; });
+            }
+
+            /* ── Mock para interceptar llamadas asíncronas de TSComponents y proveer datos locales ── */
+            if (!window._sneepXhrMocked) {
+                var origOpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function (method, url) {
+                    this._url = url;
+                    return origOpen.apply(this, arguments);
+                };
+                var origSend = XMLHttpRequest.prototype.send;
+                XMLHttpRequest.prototype.send = function () {
+                    var xhr = this;
+                    if (xhr._url && xhr._url.indexOf('SNEEP_MOCK') !== -1) {
+                        var mockId = xhr._url.match(/SNEEP_MOCK_([a-zA-Z0-9_]+)/);
+                        if (mockId && window._sneepMocks && window._sneepMocks[mockId[1]]) {
+                            setTimeout(function () {
+                                var jsonStr = JSON.stringify(window._sneepMocks[mockId[1]]);
+                                Object.defineProperty(xhr, 'status', { value: 200 });
+                                Object.defineProperty(xhr, 'readyState', { value: 4 });
+                                Object.defineProperty(xhr, 'response', { value: jsonStr });
+                                Object.defineProperty(xhr, 'responseText', { value: jsonStr });
+                                xhr.getResponseHeader = function (name) {
+                                    if (name.toLowerCase() === 'content-type') return 'application/json; charset=utf-8';
+                                    return null;
+                                };
+                                xhr.getAllResponseHeaders = function () {
+                                    return 'content-type: application/json; charset=utf-8\r\n';
+                                };
+                                if (xhr.onreadystatechange) xhr.onreadystatechange();
+                                if (xhr.onload) xhr.onload();
+                            }, 10);
+                            return;
+                        }
+                    }
+                    return origSend.apply(this, arguments);
+                };
+                window._sneepXhrMocked = true;
+                window._sneepMocks = {};
+            }
+
+            function setTSMockData(mockId, seriesObj, ids) {
+                var anios = RAW.anios;
+                var data = [];
+                for (var i = 0; i < anios.length; i++) {
+                    var row = [anios[i] + "-01-01"];
+                    for (var j = 0; j < ids.length; j++) {
+                        row.push(seriesObj[ids[j]][i]);
+                    }
+                    data.push(row);
+                }
+                var meta = [{ dataset: [], distribution: [], field: { id: "time", title: "Índice de tiempo", type: "date" } }];
+                for (var j = 0; j < ids.length; j++) {
+                    meta.push({ dataset: [], distribution: [], field: { id: ids[j], title: ids[j], type: "numeric" } });
+                }
+                window._sneepMocks[mockId] = { data: data, count: data.length, meta: meta };
+                return 'https://apis.datos.gob.ar/series/api/series/?ids=SNEEP_MOCK_' + mockId;
+            }
+
+            /* ── Gráficos por sección ── */
+            function renderSituacionLegal() {
+                if (!$('tsChartSmall1')) return;
+                Highcharts.chart('tsChartSmall1', tsBaseConfig({
+                    chart: { type: 'area', zoomType: 'x', backgroundColor: 'transparent', height: 340 },
+                    plotOptions: { area: { stacking: 'normal', lineWidth: 2, fillOpacity: 0.25, marker: { enabled: false, states: { hover: { enabled: true, radius: 5 } } } } },
+                    series: [
+                        { name: 'Condenados', data: makeSeriesData('condenados'), color: PALETTE.primary },
+                        { name: 'Procesados', data: makeSeriesData('procesados'), color: PALETTE.secondary },
+                        { name: 'Otros', data: makeSeriesData('otros'), color: PALETTE.gray }
+                    ]
+                }));
+            }
+
+            function renderGenero() {
+                var containerId = 'genero-chart';
+                var container = $(containerId);
+                if (!container) return;
+
+                // Use Highcharts directly for gender distribution
+                Highcharts.chart(containerId, tsBaseConfig({
+                    chart: { type: 'area', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    plotOptions: { area: { stacking: 'normal', lineWidth: 2, marker: { enabled: false, states: { hover: { enabled: true, radius: 5 } } } } },
+                    series: [
+                        { name: 'Varones', data: makeSeriesData('varones'), color: PALETTE.primary },
+                        { name: 'Mujeres', data: makeSeriesData('mujeres'), color: PALETTE.secondary },
+                        { name: 'Trans', data: makeSeriesData('trans'), color: PALETTE.tertiary }
+                    ]
+                }));
+            }
+
+            function renderEdad() {
+                if (!$('edad-chart')) return;
+                Highcharts.chart('edad-chart', tsBaseConfig({
+                    chart: { type: 'column', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    plotOptions: { column: { stacking: 'normal', borderRadius: 2, borderWidth: 0, pointPadding: 0.05, groupPadding: 0.1 } },
+                    series: [
+                        { name: '18-20 años', data: makeSeriesData('edad_18_20'), color: '#42A5F5' },
+                        { name: '21-34 años', data: makeSeriesData('edad_21_34'), color: PALETTE.primary },
+                        { name: '35+ años', data: makeSeriesData('edad_35_plus'), color: '#0D47A1' }
+                    ]
+                }));
+            }
+
+            function renderNacionalidad() {
+                if (!$('nacionalidad-chart')) return;
+                Highcharts.chart('nacionalidad-chart', tsBaseConfig({
+                    chart: { type: 'areaspline', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    plotOptions: { areaspline: { fillOpacity: 0.15, lineWidth: 2.5, marker: { enabled: false, states: { hover: { enabled: true, radius: 5 } } } } },
+                    series: [
+                        { name: 'Argentinos', data: makeSeriesData('nacionalidad_argentino'), color: PALETTE.primary },
+                        { name: 'Ext. país limítrofe', data: makeSeriesData('nacionalidad_limitrofe'), color: PALETTE.quaternary },
+                        { name: 'Ext. otros países', data: makeSeriesData('nacionalidad_otros'), color: PALETTE.quinary }
+                    ]
+                }));
+            }
+
+            function renderInstruccion() {
+                var containerId = 'instruccion-chart';
+                var container = $(containerId);
+                if (!container) return;
+
+                // Obtain filtered series data
+                var s = getFilteredSeries();
+                // Prepare data for each series using helper makeSeriesData (assumes it exists similar to other charts)
+                var seriesData = [
+                    { name: 'Hasta primario', data: makeSeriesData('instruccion_primario'), color: '#1565C0' },
+                    { name: 'Secundario', data: makeSeriesData('instruccion_secundario'), color: '#42A5F5' },
+                    { name: 'Terciario / Universitario', data: makeSeriesData('instruccion_terciario_uni'), color: '#90CAF9' }
+                ];
+
+                // Clear any previous content
+                container.innerHTML = '';
+
+                // Render using Highcharts directly
+                Highcharts.chart(containerId, tsBaseConfig({
+                    chart: { type: 'column', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    title: { text: 'Nivel de instrucción' },
+                    legend: { enabled: true },
+                    tooltip: { shared: true },
+                    plotOptions: { column: { stacking: 'percent', borderRadius: 2, pointPadding: 0.1, groupPadding: 0.1 } },
+                    series: seriesData,
+                    credits: { enabled: false },
+                    source: { text: 'Fuente: SNEEP – Ministerio de Justicia de la Nación' }
+                }));
+            }
+
+            /* ── KPIs ── */
+            function renderKPIs(anio) {
+                var s = getFilteredSeries();
+                var i = RAW.anios.indexOf(String(anio));
+                if (i < 0) return;
+
+                var poblacionCurrent = s.total[i];
+                var poblacionPrev = (i > 0) ? s.total[i - 1] : null;
+                $('kpi-poblacion-val').textContent = fmt(poblacionCurrent);
+                if (poblacionPrev && poblacionPrev > 0) {
+                    var diff = ((poblacionCurrent - poblacionPrev) / poblacionPrev * 100);
+                    $('kpi-poblacion-var-val').textContent = (diff > 0 ? '+' : '') + pct(diff);
+                    $('kpi-poblacion-var-icon').className = diff >= 0 ? 'fa fa-arrow-up' : 'fa fa-arrow-down';
+                    $('kpi-poblacion-var-icon').style.color = diff >= 0 ? '#2e7d32' : '#ba1a1a';
+                    $('kpi-poblacion-var-val').style.color = diff >= 0 ? '#2e7d32' : '#ba1a1a';
+                    $('kpi-poblacion-var-container').style.backgroundColor = diff >= 0 ? 'rgba(46,125,50,0.1)' : 'rgba(186,26,26,0.1)';
+                    $('kpi-poblacion-var-container').style.visibility = 'visible';
+                } else {
+                    $('kpi-poblacion-var-container').style.visibility = 'hidden';
+                }
+
+                var tasaCurrent = s.tasa_cada_100mil[i];
+                var tasaPrev = (i > 0) ? s.tasa_cada_100mil[i - 1] : null;
+                $('kpi-tasa-val').textContent = tasaCurrent.toFixed(1).replace('.', ',');
+                if (tasaPrev && tasaPrev > 0) {
+                    var diffT = ((tasaCurrent - tasaPrev) / tasaPrev * 100);
+                    $('kpi-tasa-var-val').textContent = (diffT > 0 ? '+' : '') + pct(diffT);
+                    $('kpi-tasa-var-icon').className = diffT >= 0 ? 'fa fa-arrow-up' : 'fa fa-arrow-down';
+                    $('kpi-tasa-var-icon').style.color = diffT >= 0 ? '#2e7d32' : '#ba1a1a';
+                    $('kpi-tasa-var-val').style.color = diffT >= 0 ? '#2e7d32' : '#ba1a1a';
+                    $('kpi-tasa-var-container').style.backgroundColor = diffT >= 0 ? 'rgba(46,125,50,0.1)' : 'rgba(186,26,26,0.1)';
+                    $('kpi-tasa-var-container').style.visibility = 'visible';
+                } else {
+                    $('kpi-tasa-var-container').style.visibility = 'hidden';
+                }
+                if (i < 0) return;
+                var t = s.total[i];
+                if (t === 0) t = 1;
+
+                $('comp-condenados-pct').textContent = pct(s.condenados[i] / t * 100);
+                $('comp-condenados-abs').textContent = fmt(s.condenados[i]) + ' personas registradas';
+                $('comp-varones-pct').textContent = pct(s.varones[i] / t * 100);
+                $('comp-varones-abs').textContent = fmt(s.varones[i]) + ' varones registrados';
+                $('comp-argentinos-pct').textContent = pct(s.nacionalidad_argentino[i] / t * 100);
+                $('comp-argentinos-abs').textContent = fmt(s.nacionalidad_argentino[i]) + ' personas';
+                $('comp-edad-pct').textContent = pct((s.edad_18_20[i] + s.edad_21_34[i]) / t * 100);
+                $('comp-edad-abs').textContent = fmt(s.edad_18_20[i] + s.edad_21_34[i]) + ' jóvenes/adultos';
+
+                $('legal-value-condenados').textContent = pct(s.condenados[i] / t * 100);
+                $('legal-value-procesados').textContent = pct(s.procesados[i] / t * 100);
+                $('legal-value-otros').textContent = pct(s.otros[i] / t * 100);
+
+                $('genero-value-varones').textContent = pct(s.varones[i] / t * 100);
+                $('genero-value-mujeres').textContent = pct(s.mujeres[i] / t * 100);
+                $('genero-value-trans').textContent = t > 0 ? pct(s.trans[i] / t * 100) : '0 %';
+
+                $('edad-value-18-20').textContent = pct(s.edad_18_20[i] / t * 100);
+                $('edad-value-21-34').textContent = pct(s.edad_21_34[i] / t * 100);
+                $('edad-value-35-plus').textContent = pct(s.edad_35_plus[i] / t * 100);
+
+                $('nac-value-argentino').textContent = pct(s.nacionalidad_argentino[i] / t * 100);
+                $('nac-value-limitrofe').textContent = pct(s.nacionalidad_limitrofe[i] / t * 100);
+                $('nac-value-otros').textContent = pct(s.nacionalidad_otros[i] / t * 100);
+
+                $('inst-value-primario').textContent = pct(s.instruccion_primario[i] / t * 100);
+                $('inst-value-secundario').textContent = pct(s.instruccion_secundario[i] / t * 100);
+                $('inst-value-terciario-uni').textContent = pct(s.instruccion_terciario_uni[i] / t * 100);
+
+                document.querySelectorAll('.kpi-year').forEach(function (el) { el.textContent = anio; });
+            }
+
+            function renderAll() {
+                var anio = $('edit-anio').value;
+                renderKPIs(anio);
+                renderSituacionLegal();
+                renderGenero();
+                renderEdad();
+                renderNacionalidad();
+                renderInstruccion();
+            }
+
+            /* ── Filtros ── */
+            function populateSelect(sel, items) {
+                sel.innerHTML = '';
+                items.forEach(function (it) {
+                    var o = document.createElement('option');
+                    o.value = it.key; o.textContent = it.label;
+                    sel.appendChild(o);
+                });
+            }
+
+            function populateFilters() {
+                var anioSel = $('edit-anio');
+                var jurSel = $('edit-jurisdiccion');
+                var delSel = $('edit-delito');
+
+                RAW.anios.slice().reverse().forEach(function (a) {
+                    var o = document.createElement('option');
+                    o.value = a; o.textContent = a;
+                    anioSel.appendChild(o);
+                });
+
+                var jurItems = [];
+                var jurKeys = Object.keys(RAW.filtros.jurisdicciones);
+                for (var j = 0; j < jurKeys.length; j++) {
+                    jurItems.push({ key: jurKeys[j], label: RAW.filtros.jurisdicciones[jurKeys[j]].label });
+                }
+                populateSelect(jurSel, jurItems);
+
+                var delItems = [];
+                var delKeys = Object.keys(RAW.filtros.delitos);
+                for (var d = 0; d < delKeys.length; d++) {
+                    delItems.push({ key: delKeys[d], label: RAW.filtros.delitos[delKeys[d]].label });
+                }
+                populateSelect(delSel, delItems);
+
+                anioSel.addEventListener('change', renderAll);
+                jurSel.addEventListener('change', renderAll);
+                delSel.addEventListener('change', renderAll);
+            }
+
+            /* ── Init ── */
+            function init() {
+                try {
+                    fetch('assets/data/datos-sneep.json')
+                        .then(function (r) { if (!r.ok) throw new Error('fail'); return r.json(); })
+                        .then(function (d) {
+                            if (d.anios) RAW.anios = d.anios;
+                            if (d.filtros) RAW.filtros = d.filtros;
+                            if (d.series) RAW.series = d.series;
+                        })
+                        .catch(function () { console.warn('Usando datos embebidos'); })
+                        .finally(function () {
+                            populateFilters();
+                            renderAll();
+                        });
+                } catch (e) {
+                    console.warn('Error:', e);
+                    populateFilters();
+                    renderAll();
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+
+</html>

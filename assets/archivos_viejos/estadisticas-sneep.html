@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#242C4F">
+    <title>Estadísticas SNEEP | Argentina.gob.ar</title>
+    <link rel="icon"
+        href="https://qa2-back.argentina.gob.ar/profiles/argentinagobar/themes/argentinagobar/argentinagobar_theme/favicon.ico"
+        type="image/x-icon">
+    <!-- Poncho / Bootstrap -->
+    <link type="text/css" rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        media="all">
+    <link type="text/css" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" media="all">
+    <link rel="stylesheet"
+        href="https://www.argentina.gob.ar/profiles/argentinagobar/themes/contrib/poncho/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet"
+        href="https://www.argentina.gob.ar/profiles/argentinagobar/themes/contrib/poncho/css/icono-arg.css">
+    <link rel="stylesheet"
+        href="https://www.argentina.gob.ar/profiles/argentinagobar/themes/contrib/poncho/css/poncho.min.css">
+
+    <!-- Series de Tiempo AR -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/datosgobar/series-tiempo-ar-explorer@ts_components_2.6.2/dist/css/components.css"
+        type="text/css">
+    <script
+        src='https://cdn.jsdelivr.net/gh/datosgobar/series-tiempo-ar-explorer@ts_components_2.6.2/dist/js/components.js'></script>
+
+    <!-- Highcharts -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    <style>
+        /* Composición panel */
+        .composicion-panel {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .composicion-mapa {
+            padding: 30px;
+            border-right: 1px solid #eee;
+            min-height: 350px;
+            position: relative;
+        }
+
+        .composicion-mapa .mapa-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: #0072BB;
+            opacity: 0.3;
+        }
+
+        .composicion-mapa .mapa-placeholder .fa {
+            font-size: 100px;
+        }
+
+        .composicion-mapa .mapa-placeholder p {
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 15px;
+        }
+
+        .composicion-derecha {
+            padding: 30px;
+        }
+
+        @media (max-width: 991px) {
+            .composicion-mapa {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+        }
+
+        /* Evaluación calidad */
+        .evaluacion-calidad {
+            background: #ebebe6;
+            padding: 40px 30px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid #ddd;
+            margin-bottom: 30px;
+        }
+
+        .evaluacion-calidad .badge-label {
+            display: inline-block;
+            padding: 6px 20px;
+            background: #fff;
+            color: #888;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            margin: 0 5px 20px;
+        }
+
+        .evaluacion-calidad .grado-letra {
+            font-size: 120px;
+            font-weight: 700;
+            line-height: 1;
+            color: #0072BB;
+            margin-bottom: 20px;
+        }
+
+        /* Descarga */
+        .descarga-section {
+            text-align: center;
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body class="html no-sidebars">
+
+    <!-- Encabezado Oficial -->
+    <header>
+        <nav class="navbar navbar-top navbar-default border-bottom-amarillo">
+            <div class="container">
+                <div>
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="https://www.argentina.gob.ar/" id="navbar-brand"
+                            aria-label="Argentina.gob.ar Presidencia de la Nación">
+                            <img src="https://www.argentina.gob.ar/profiles/argentinagobar/themes/argentinagobar/argentinagobar_theme/logo_argentina-azul.svg"
+                                alt="Argentina.gob.ar" height="50" width="254">
+                        </a>
+                        <a class="btn btn-mi-argentina btn-login visible-xs bg-miarg-azul"
+                            href="https://mi.argentina.gob.ar" title="Ingresar a Mi Argentina">
+                            <i class="icono-arg-mi-argentina text-white"></i><span class="sr-only">Ir a Mi
+                                Argentina</span>
+                        </a>
+                        <button class="btn btn-mi-argentina btn-login visible-xs" aria-labelledby="edit-keys"><span
+                                class="fa fa-search fa-fw"></span><span class="sr-only">Buscar</span></button>
+                    </div>
+                    <div class="nav navbar-nav navbar-right hidden-xs">
+                        <button class="btn btn-link btn-search-reset visible-xs"><i class="fa fa-times"><span
+                                    class="sr-only">Cerrar el buscador</span></i></button>
+                        <div id="cd-login">
+                            <a href="https://mi.argentina.gob.ar/" id="btn-mi-argentina"
+                                class="btn hidden-xs p-l-1 btn-login bg-miarg-azul"
+                                aria-label="Ingresar a Mi Argentina">
+                                <i class="fa-3x fa icono-arg-mi-argentina-extended text-white p-t-0"><span
+                                        class="sr-only">Mi Argentina</span></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        <div class="container margin-bottom-4">
+            <div class="region region-content">
+                <div id="block-system-main" class="block block-system clearfix pt-2">
+
+                    <!-- Migas de pan y Hero Section -->
+                    <div class="panel-pane pane-imagen-destacada">
+                        <div class="pane-content">
+                            <div class="jumbotron m-t-0">
+                                <div class="jumbotron_bar">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <ol class="breadcrumb device-breadcrumb" itemscope=""
+                                                    itemtype="https://schema.org/BreadcrumbList" role="list"
+                                                    aria-label="Migas de pan">
+                                                    <li itemprop="itemListElement" itemscope=""
+                                                        itemtype="https://schema.org/ListItem"
+                                                        class="device-breadcrumb__hidden-item"><a itemprop="item"
+                                                            href="/"><span itemprop="name">Inicio</span></a>
+                                                        <meta itemprop="position" content="1">
+                                                    </li>
+                                                    <li itemprop="itemListElement" itemscope=""
+                                                        itemtype="https://schema.org/ListItem"
+                                                        class="device-breadcrumb__last-visible-item"><a itemprop="item"
+                                                            href="/justicia"><span itemprop="name">Ministerio de
+                                                                Justicia</span></a>
+                                                        <meta itemprop="position" content="2">
+                                                    </li>
+                                                    <li class="active device-breadcrumb__hidden-item"
+                                                        itemprop="itemListElement" itemscope=""
+                                                        itemtype="https://schema.org/ListItem" aria-current="page"><span
+                                                            itemprop="name">Estadísticas SNEEP</span>
+                                                        <meta itemprop="position" content="3">
+                                                    </li>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="encabezado">
+                                <div class="bg-arg-azul container-fluid p-y-2">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-md-9 col-xs-12 col-sm-12">
+                                                <h1>SNEEP – CENSO PENITENCIARIO NACIONAL</h1>
+                                                <p>El Sistema Nacional de Estadísticas sobre Ejecución de la Pena
+                                                    (SNEEP) recolecta información sobre los hechos presuntamente
+                                                    delictuosos registrados por las fuerzas policiales y de seguridad
+                                                    federales.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido SNEEP -->
+                    <div>
+                        <!-- Filtros -->
+                        <div class="bg-gray p-t-2 m-b-3 row form-wrapper form-group" id="edit-basic"
+                            style="margin-bottom: 3rem;">
+                            <div class="col-md-4">
+                                <div class="form-item form-type-select form-group">
+                                    <label class="control-label" for="edit-anio"><span
+                                            class="text-arg-gris-intermedio">AÑO</span></label>
+                                    <select class="form-control form-select" id="edit-anio" name="anio">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-item form-type-select form-group">
+                                    <label class="control-label" for="edit-jurisdiccion"><span
+                                            class="text-arg-gris-intermedio">JURISDICCIÓN</span></label>
+                                    <select class="form-control form-select" id="edit-jurisdiccion" name="jurisdiccion">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-item form-type-select form-group">
+                                    <label class="control-label" for="edit-delito"><span
+                                            class="text-arg-gris-intermedio">DELITO</span></label>
+                                    <select class="form-control form-select" id="edit-delito" name="delito">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- KPIs Superiores (Card mínima estilo TSComponents) -->
+                        <div class="row cardtiempo text-center justify-content-center" style="margin-bottom: 30px;">
+                            <div class="col-sm-4 d-flex justify-content-center">
+                                <div id="poblacion-card-med" style="display: inline-block;"></div>
+                            </div>
+                            <div class="col-sm-4 d-flex justify-content-center">
+                                <div id="tasa-card-med" style="display: inline-block;"></div>
+                            </div>
+                            <div class="col-sm-4 d-flex justify-content-center">
+                                <div id="capacidad-card-med" style="display: inline-block;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Composición de la población -->
+                        <h2 class="h4" style="margin-bottom: 15px;">Composición de la población</h2>
+                        <div class="composicion-panel">
+                            <div class="row">
+                                <!-- Left: Mapa -->
+                                <div class="col-md-6 composicion-mapa">
+                                    <div class="mapa-placeholder">
+                                        <i class="fa fa-map-o"></i>
+                                        <p>Mapa temático Argentina</p>
+                                    </div>
+                                    <div id="chart-provincias" style="min-height: 300px;"></div>
+                                </div>
+                                <!-- Right: KPIs -->
+                                <div class="col-md-6 composicion-derecha">
+                                    <div class="row" style="margin-bottom: 20px;">
+                                        <div class="col-xs-6 col-md-6">
+                                            <div id="comp-condenados-card"></div>
+                                        </div>
+                                        <div class="col-xs-6 col-md-6">
+                                            <div id="comp-varones-card"></div>
+                                        </div>
+                                        <div class="col-xs-6 col-md-6">
+                                            <div id="comp-argentinos-card"></div>
+                                        </div>
+                                        <div class="col-xs-6 col-md-6">
+                                            <div id="comp-edad-card"></div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary btn-lg btn-block">
+                                        Ver reporte completo por provincia
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Situación Legal -->
+                        <h2 class="h4" style="margin-bottom: 15px;">Situación legal</h2>
+                        <div class="sneep-section">
+                            <div class="row">
+                                <!-- Izquierda: KPIs -->
+                                <div class="col-md-3 sneep-kpis">
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="legal-value-condenados">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Condenados</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #2e7d32; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="legal-value-procesados">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Procesados</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #424242; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="legal-value-otros">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Otros</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Derecha: Gráfico -->
+                                <div class="col-md-9 sneep-chart-area">
+                                    <p class="sneep-chart-label">Serie de tiempo 2002–2024</p>
+                                    <div id="tsChartSmall1" style="min-height:300px;width:100%;"></div>
+                                    <p class="c-span bt c-source" style="margin-top:8px;">Fuente: SNEEP – Ministerio de
+                                        Justicia de la Nación</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Género -->
+                        <h2 class="h4" style="margin-bottom: 15px;">Género</h2>
+                        <div class="sneep-section">
+                            <div class="row justify-content-center">
+                                <!-- Izquierda: KPIs -->
+                                <div class="col-md-3 sneep-kpis">
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="genero-value-varones">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Varones</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #2e7d32; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="genero-value-mujeres">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Mujeres</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #c62828; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="genero-value-trans">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Trans</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Derecha: Gráfico -->
+                                <div class="col-md-9 sneep-chart-area">
+                                    <p class="sneep-chart-label">Serie de tiempo 2002–2024</p>
+                                    <div id="genero-chart" style="min-height: 280px; width: 100%;"></div>
+                                    <p class="c-span bt c-source" style="margin-top:8px;">Fuente: SNEEP – Ministerio de
+                                        Justicia de la Nación</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Edad -->
+                        <h2 class="h4" style="margin-bottom: 15px;">Edad</h2>
+                        <div class="sneep-section">
+                            <div class="row justify-content-center">
+                                <!-- Izquierda: KPIs -->
+                                <div class="col-md-3 sneep-kpis">
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="edad-value-18-20">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;"><strong>18-20
+                                                    años</strong><br>Año <span class="kpi-year">2024</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="edad-value-21-34">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;"><strong>21-34
+                                                    años</strong><br>Año <span class="kpi-year">2024</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="edad-value-35-plus">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;"><strong>35+
+                                                    años</strong><br>Año <span class="kpi-year">2024</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Derecha: Gráfico -->
+                                <div class="col-md-9 sneep-chart-area">
+                                    <p class="sneep-chart-label">Serie de tiempo 2002–2024</p>
+                                    <div id="edad-chart" style="min-height: 280px; width: 100%;"></div>
+                                    <p class="c-span bt c-source" style="margin-top:8px;">Fuente: SNEEP – Ministerio de
+                                        Justicia de la Nación</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nacionalidad -->
+                        <h2 class="h4" style="margin-bottom: 15px;">Nacionalidad</h2>
+                        <div class="sneep-section">
+                            <div class="row">
+                                <!-- Izquierda: KPIs -->
+                                <div class="col-md-3 sneep-kpis">
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="nac-value-argentino">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Argentino</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="nac-value-limitrofe">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;"><strong>Extranjero país
+                                                    limítrofe</strong><br>Año <span class="kpi-year">2024</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="nac-value-otros">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;"><strong>Extranjero
+                                                    otros países</strong><br>Año <span class="kpi-year">2024</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Derecha: Gráfico -->
+                                <div class="col-md-9 sneep-chart-area">
+                                    <p class="sneep-chart-label">Serie de tiempo 2002–2024</p>
+                                    <div id="nacionalidad-chart" style="min-height: 280px; width: 100%;"></div>
+                                    <p class="c-span bt c-source" style="margin-top:8px;">Fuente: SNEEP – Ministerio de
+                                        Justicia de la Nación</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Nivel de instrucción -->
+                        <h2 class="h4" style="margin-bottom: 15px;">Nivel de instrucción</h2>
+                        <div class="sneep-section">
+                            <div class="row">
+                                <!-- Izquierda: KPIs -->
+                                <div class="col-md-3 sneep-kpis">
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="inst-value-primario">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;"><strong>Hasta
+                                                    primario</strong><br>Año <span class="kpi-year">2024</span></p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="inst-value-secundario">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;">
+                                                <strong>Secundario</strong><br>Año <span class="kpi-year">2024</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="panel panel-default" style="margin-bottom: 15px;">
+                                        <div class="panel-body text-center">
+                                            <div class="h2"
+                                                style="color: #0072BB; margin-top:0; margin-bottom:5px; font-weight:700;"
+                                                id="inst-value-terciario-uni">33 %</div>
+                                            <p class="text-muted small" style="margin-bottom:0;"><strong>Terciario o
+                                                    universitario</strong><br>Año <span class="kpi-year">2024</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Derecha: Gráfico -->
+                                <div class="col-md-9 sneep-chart-area">
+                                    <p class="sneep-chart-label">Serie de tiempo 2002–2024</p>
+                                    <div id="instruccion-chart" style="min-height: 280px; width: 100%;"></div>
+                                    <p class="c-span bt c-source" style="margin-top:8px;">Fuente: SNEEP – Ministerio de
+                                        Justicia de la Nación</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descarga -->
+                        <div class="descarga-section">
+                            <p><strong>Descargá el dataset de este año</strong></p>
+                            <button class="btn btn-primary btn-lg">
+                                <i class="fa fa-download"></i> Descargar
+                            </button>
+                        </div>
+
+                        <!-- Evaluación Calidad -->
+                        <div class="evaluacion-calidad">
+                            <div>
+                                <span class="badge-label">MINISTERIO</span>
+                                <span class="badge-label">UNODC</span>
+                            </div>
+                            <h3>Evaluación de calidad estadística</h3>
+                            <p style="max-width: 700px; margin: 0 auto 20px;">
+                                El Centro de Excelencia de la Oficina de las Naciones Unidas contra la Droga y el Delito
+                                (UNODC) otorga el presente <strong>Grado de Calidad Estadística</strong> tipo:
+                            </p>
+                            <div class="grado-letra">"A"</div>
+                            <p class="text-muted small"
+                                style="max-width: 800px; margin: 0 auto 30px; font-style: italic;">
+                                Obtenida de la revisión de calidad de la operación estadística denominada SNEEP con base
+                                en los Principios Fundamentales de las Estadísticas Oficiales de las Naciones Unidas.
+                            </p>
+                            <p
+                                style="color: #0072BB; font-weight: 700; font-size: 10px; text-transform: uppercase; letter-spacing: 2px;">
+                                CIUDAD DE BUENOS AIRES, 15 DE MAYO DE 2024</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de página Oficial -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Trámites</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/turnos">Turnos</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/tad">Trámites a distancia</a></li>
+                            <li class="last leaf"><a
+                                    href="https://www.argentina.gob.ar/miargentina/mesadeayuda">Atención a la
+                                    ciudadanía</a></li>
+                        </ul>
+                    </section>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Acerca de la República Argentina</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/pais">Nuestro país</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/normativa">Leyes argentinas</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/organismos">Organismos</a></li>
+                            <li class="last leaf"><a
+                                    href="https://www.argentina.gob.ar/desregulacion/mapa-del-estado">Mapa del
+                                    Estado</a></li>
+                        </ul>
+                    </section>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Acerca de Argentina.gob.ar</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/acerca">Acerca de este
+                                    sitio</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/terminos-y-condiciones">Términos y
+                                    condiciones</a></li>
+                            <li class="last leaf"><a href="https://www.argentina.gob.ar/sugerencias">Sugerencias</a>
+                            </li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid border-top-amarillo">
+            <div class="row sub-footer">
+                <div class="container">
+                    <div class="col-sm-6 m-y-1 p-x-0"></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function () {
+            var RAW = {
+                "anios": ["2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024"],
+                "filtros": {
+                    "jurisdicciones": {
+                        "argentina": { "label": "Argentina (Total Nacional)", "factor": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
+                        "spf": { "label": "Servicio Penitenciario Federal", "factor": [0.065, 0.067, 0.068, 0.066, 0.069, 0.070, 0.072, 0.074, 0.076, 0.078, 0.080, 0.082, 0.085, 0.088, 0.091, 0.094, 0.097, 0.100, 0.103, 0.106, 0.109, 0.112, 0.115] },
+                        "pba": { "label": "Provincia de Buenos Aires", "factor": [0.32, 0.31, 0.30, 0.31, 0.30, 0.29, 0.29, 0.28, 0.28, 0.28, 0.27, 0.27, 0.27, 0.26, 0.26, 0.26, 0.25, 0.25, 0.25, 0.24, 0.24, 0.24, 0.23] },
+                        "caba": { "label": "Ciudad Autónoma de Buenos Aires", "factor": [0.035, 0.036, 0.037, 0.036, 0.037, 0.038, 0.038, 0.039, 0.039, 0.040, 0.040, 0.041, 0.041, 0.042, 0.042, 0.043, 0.043, 0.044, 0.044, 0.045, 0.045, 0.046, 0.046] },
+                        "cordoba": { "label": "Córdoba", "factor": [0.060, 0.061, 0.062, 0.061, 0.062, 0.063, 0.063, 0.064, 0.064, 0.065, 0.065, 0.066, 0.066, 0.067, 0.067, 0.068, 0.068, 0.069, 0.069, 0.070, 0.070, 0.071, 0.071] },
+                        "santafe": { "label": "Santa Fe", "factor": [0.055, 0.056, 0.057, 0.056, 0.057, 0.058, 0.058, 0.059, 0.059, 0.060, 0.060, 0.061, 0.061, 0.062, 0.062, 0.063, 0.063, 0.064, 0.064, 0.065, 0.065, 0.066, 0.066] },
+                        "resto": { "label": "Resto del país", "factor": [0.465, 0.470, 0.476, 0.471, 0.475, 0.481, 0.477, 0.476, 0.473, 0.471, 0.476, 0.472, 0.467, 0.475, 0.473, 0.466, 0.463, 0.457, 0.451, 0.444, 0.437, 0.429, 0.426] }
+                    },
+                    "delitos": {
+                        "todos": { "label": "Todos los delitos", "factor": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] },
+                        "homicidios": { "label": "Homicidios dolosos", "factor": [0.028, 0.027, 0.026, 0.029, 0.027, 0.026, 0.025, 0.026, 0.025, 0.024, 0.024, 0.025, 0.025, 0.026, 0.026, 0.027, 0.027, 0.028, 0.028, 0.027, 0.027, 0.026, 0.026] },
+                        "robo": { "label": "Robo", "factor": [0.18, 0.19, 0.19, 0.20, 0.19, 0.19, 0.18, 0.18, 0.18, 0.17, 0.17, 0.17, 0.17, 0.16, 0.16, 0.16, 0.16, 0.15, 0.15, 0.15, 0.15, 0.14, 0.14] },
+                        "trafico": { "label": "Tráfico de drogas", "factor": [0.12, 0.12, 0.13, 0.12, 0.13, 0.13, 0.14, 0.14, 0.14, 0.15, 0.15, 0.15, 0.15, 0.16, 0.16, 0.16, 0.16, 0.17, 0.17, 0.17, 0.17, 0.18, 0.18] },
+                        "estafas": { "label": "Estafas y otros", "factor": [0.08, 0.08, 0.07, 0.08, 0.07, 0.07, 0.08, 0.08, 0.08, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.09, 0.10, 0.10, 0.10, 0.10, 0.10, 0.10] },
+                        "resto_delitos": { "label": "Resto de delitos", "factor": [0.572, 0.573, 0.574, 0.561, 0.583, 0.585, 0.587, 0.572, 0.573, 0.556, 0.557, 0.554, 0.556, 0.545, 0.544, 0.542, 0.539, 0.520, 0.510, 0.511, 0.503, 0.514, 0.504] }
+                    }
+                },
+                "series": {
+                    "total": [44969, 42687, 53029, 43689, 50428, 50980, 53448, 54758, 58917, 60106, 61192, 64109, 68407, 71464, 76261, 85283, 94883, 100634, 94944, 101267, 105053, 111967, 120700],
+                    "condenados": [17756, 16803, 21054, 18906, 20537, 20196, 21333, 23590, 27320, 29095, 29902, 31289, 32940, 34992, 39373, 46405, 50628, 56270, 52035, 55933, 61291, 67352, 72894],
+                    "procesados": [26477, 25117, 31043, 24232, 29052, 29972, 31389, 30409, 30832, 30305, 30643, 31785, 34613, 35779, 36374, 38315, 43597, 43752, 42348, 44687, 43191, 43459, 46828],
+                    "otros": [736, 767, 932, 551, 839, 812, 726, 759, 765, 706, 647, 1035, 854, 693, 514, 563, 658, 612, 561, 647, 571, 1156, 978],
+                    "varones": [42567, 40393, 50408, 41517, 47637, 48176, 50641, 52125, 56198, 57195, 58338, 61270, 65418, 68468, 73014, 81553, 90375, 96108, 91254, 96617, 100607, 107116, 115281],
+                    "mujeres": [2402, 2294, 2621, 2172, 2791, 2804, 2807, 2633, 2719, 2911, 2854, 2839, 2989, 2963, 3184, 3602, 4362, 4413, 3568, 4476, 4256, 4642, 5213],
+                    "trans": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 11, 15, 20, 33, 63, 128, 146, 113, 122, 174, 190, 206],
+                    "edad_18_20": [4496, 4268, 5302, 4368, 5042, 5098, 5344, 5475, 5891, 6010, 6119, 6410, 6840, 7146, 7626, 8528, 9488, 10063, 9494, 10126, 10505, 11196, 12070],
+                    "edad_21_34": [22484, 21343, 26514, 21844, 25214, 25490, 26724, 27379, 29458, 30053, 30596, 32054, 34203, 35732, 38130, 42641, 47441, 50317, 47472, 50633, 52526, 55983, 60350],
+                    "edad_35_plus": [17989, 17076, 21213, 17477, 20172, 20392, 21380, 21904, 23568, 24043, 24477, 25645, 27364, 28586, 30505, 34114, 37954, 40254, 37978, 40508, 42022, 44788, 48280],
+                    "nacionalidad_argentino": [40472, 38418, 47726, 39320, 45385, 45882, 48103, 49282, 53025, 54095, 55072, 57698, 61566, 64317, 68634, 76754, 85394, 90570, 85449, 91140, 94547, 100770, 108630],
+                    "nacionalidad_limitrofe": [3597, 3414, 4242, 3495, 4034, 4078, 4275, 4380, 4713, 4808, 4895, 5128, 5472, 5717, 6100, 6822, 7590, 8050, 7595, 8101, 8404, 8957, 9656],
+                    "nacionalidad_otros": [899, 853, 1060, 873, 1008, 1019, 1068, 1095, 1178, 1202, 1223, 1282, 1368, 1429, 1525, 1705, 1897, 2012, 1898, 2025, 2101, 2239, 2414],
+                    "instruccion_primario": [26981, 25612, 31817, 26213, 30256, 30588, 32068, 32854, 35350, 36063, 36715, 38465, 41044, 42878, 45756, 51169, 56929, 60380, 56966, 60760, 63031, 67180, 72420],
+                    "instruccion_secundario": [13490, 12806, 15908, 13106, 15128, 15294, 16034, 16427, 17675, 18031, 18357, 19232, 20522, 21439, 22878, 25584, 28464, 30190, 28483, 30380, 31515, 33590, 36210],
+                    "instruccion_terciario_uni": [4496, 4268, 5302, 4368, 5042, 5098, 5344, 5475, 5891, 6010, 6119, 6410, 6840, 7146, 7626, 8528, 9488, 10063, 9494, 10126, 10505, 11196, 12070],
+                    "tasa_cada_100mil": [118.9, 111.5, 136.8, 111.7, 127.8, 128.2, 133.3, 135.5, 144.5, 146.3, 148.1, 154.2, 163.5, 169.6, 179.7, 199.5, 220.3, 231.8, 217.3, 230.2, 237.1, 250.6, 268.0],
+                    "capacidad_operativa": [52000, 52500, 53000, 53500, 54000, 55000, 56000, 57000, 58500, 60000, 62000, 64000, 66000, 68000, 70000, 72000, 74000, 76000, 78000, 80000, 82000, 85000, 88000],
+                    "reincidencia": [28.2, 27.8, 29.1, 26.5, 27.3, 26.9, 27.5, 28.0, 28.4, 29.0, 29.5, 30.1, 30.8, 31.2, 31.5, 32.0, 32.4, 33.0, 31.5, 30.8, 30.2, 29.5, 28.8]
+                }
+            };
+
+            var PALETTE = {
+                primary: '#0072BB',
+                secondary: '#2e7d32',
+                tertiary: '#F44336',
+                quaternary: '#FF9800',
+                quinary: '#9C27B0',
+                gray: '#607D8B'
+            };
+            var COLORS = [PALETTE.primary, PALETTE.secondary, PALETTE.tertiary, PALETTE.quaternary, PALETTE.quinary, PALETTE.gray];
+
+            Highcharts.setOptions({
+                lang: {
+                    months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                    shortMonths: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                    thousandsSep: '.',
+                    decimalPoint: ','
+                },
+                chart: {
+                    style: { fontFamily: '"Encode Sans", sans-serif' },
+                    backgroundColor: 'transparent'
+                }
+            });
+
+            function $(id) { return document.getElementById(id); }
+            function fmt(n) { return n.toLocaleString('es-AR'); }
+            function pct(n) { return n.toFixed(1).replace('.', ',') + ' %'; }
+
+            /* ── Filtrado de datos ── */
+            function getFilteredSeries() {
+                var jurKey = $('edit-jurisdiccion').value || 'argentina';
+                var delKey = $('edit-delito').value || 'todos';
+                var jur = RAW.filtros.jurisdicciones[jurKey] || RAW.filtros.jurisdicciones.argentina;
+                var del = RAW.filtros.delitos[delKey] || RAW.filtros.delitos.todos;
+                var out = {};
+                var seriesNum = ['total', 'condenados', 'procesados', 'otros', 'varones', 'mujeres', 'trans',
+                    'edad_18_20', 'edad_21_34', 'edad_35_plus',
+                    'nacionalidad_argentino', 'nacionalidad_limitrofe', 'nacionalidad_otros',
+                    'instruccion_primario', 'instruccion_secundario', 'instruccion_terciario_uni'];
+                for (var s = 0; s < seriesNum.length; s++) {
+                    var key = seriesNum[s];
+                    var base = RAW.series[key];
+                    var arr = [];
+                    for (var y = 0; y < base.length; y++) {
+                        arr.push(Math.round(base[y] * jur.factor[y] * del.factor[y]));
+                    }
+                    out[key] = arr;
+                }
+                out.tasa_cada_100mil = [];
+                for (var y = 0; y < RAW.series.tasa_cada_100mil.length; y++) {
+                    out.tasa_cada_100mil.push(+(RAW.series.tasa_cada_100mil[y] * jur.factor[y] * del.factor[y]).toFixed(1));
+                }
+                out.capacidad_operativa = [];
+                for (var y = 0; y < RAW.series.capacidad_operativa.length; y++) {
+                    out.capacidad_operativa.push(Math.round(RAW.series.capacidad_operativa[y] * jur.factor[y]));
+                }
+                out.reincidencia = [];
+                for (var y = 0; y < RAW.series.reincidencia.length; y++) {
+                    out.reincidencia.push(+(RAW.series.reincidencia[y] + (Math.random() - 0.5) * 2).toFixed(1));
+                }
+                return out;
+            }
+
+            /* ── Cards con clases TSComponents (estilizadas por components.css) ── */
+            function renderTSCard(containerId, opts) {
+                var container = $(containerId);
+                if (!container) return;
+                var s = getFilteredSeries();
+                var anios = RAW.anios.map(function (a) { return parseInt(a, 10); });
+                var seriesData = (s[opts.serieKey] || []).map(function (v, i) { return [anios[i], v]; });
+                var currentVal = (s[opts.serieKey] || [])[RAW.anios.indexOf(String(opts.year))];
+                if (currentVal === undefined) return;
+                var color = opts.color || PALETTE.primary;
+                var formattedVal = opts.format === 'decimal' ? currentVal.toFixed(1).replace('.', ',') : currentVal.toLocaleString('es-AR');
+                var prevIdx = RAW.anios.indexOf(String(opts.year)) - 1;
+                var prevVal = prevIdx >= 0 ? (s[opts.serieKey] || [])[prevIdx] : null;
+                var variacion = '';
+                if (prevVal && prevVal > 0) {
+                    var diff = ((currentVal - prevVal) / prevVal * 100);
+                    var arrow = diff >= 0 ? '▲' : '▼';
+                    var diffColor = diff >= 0 ? '#2e7d32' : '#ba1a1a';
+                    variacion = '<span style="color:' + diffColor + ';font-size:13px;font-weight:600;">' + arrow + ' ' + Math.abs(diff).toFixed(1).replace('.', ',') + '%</span>';
+                }
+                container.innerHTML = '<div class="card no-graph full" style="border-top-color:' + color + '">'
+                    + '<div class="c-head"><p class="c-title">' + opts.title + '</p><p class="c-span">' + opts.year + '</p></div>'
+                    + '<div class="c-data"><p class="c-main" style="color:' + color + '">' + formattedVal + '</p></div>'
+                    + '<p class="c-units">' + (opts.units || '') + ' ' + variacion + '</p>'
+                    + '<div id="' + containerId + '-spark" style="height:60px;width:100%;"></div>'
+                    + '<p class="c-span bt c-source">Fuente: SNEEP – Ministerio de Justicia de la Nación</p>'
+                    + '</div>';
+                if (typeof Highcharts !== 'undefined') {
+                    Highcharts.chart(containerId + '-spark', {
+                        chart: { type: 'area', backgroundColor: 'transparent', margin: [5, 0, 5, 0] },
+                        title: { text: null },
+                        xAxis: { visible: false },
+                        yAxis: { visible: false },
+                        tooltip: { enabled: false },
+                        legend: { enabled: false },
+                        credits: { enabled: false },
+                        exporting: { enabled: false },
+                        plotOptions: { area: { fillColor: { linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 }, stops: [[0, Highcharts.color(color).setOpacity(0.3).get('rgba')], [1, Highcharts.color(color).setOpacity(0.05).get('rgba')]] }, lineWidth: 2, marker: { enabled: false } } },
+                        series: [{ data: seriesData, color: color }]
+                    });
+                }
+            }
+
+            function renderTSMinimalCard(containerId, opts) {
+                var container = $(containerId);
+                if (!container) return;
+                var color = opts.color || PALETTE.primary;
+
+                /* Si la tarjeta ya existe (ej. al cambiar filtros), simplemente actualizamos los datos
+                   síncronamente para que sea instantáneo y no haya que llamar a la API de nuevo. */
+                var existingCard = container.querySelector('.card');
+                if (existingCard) {
+                    var mainEl = existingCard.querySelector('.c-main');
+                    if (mainEl) {
+                        mainEl.textContent = opts.value;
+                        mainEl.style.color = color; 
+                    }
+                    var unitsEl = existingCard.querySelector('.c-units');
+                    if (unitsEl) unitsEl.textContent = opts.exactValue ? (opts.exactValue + ' personas') : '';
+                    var sourceEl = existingCard.querySelector('.c-source');
+                    if (sourceEl) sourceEl.textContent = 'Año ' + opts.year;
+                    var titleEl = existingCard.querySelector('.c-title');
+                    if (titleEl) titleEl.textContent = opts.label;
+                    return;
+                }
+
+                container.innerHTML = '';
+
+                if (typeof TSComponents !== 'undefined' && TSComponents.Card) {
+                    /* Ocultamos temporalmente para evitar el parpadeo del dato de la API */
+                    container.style.visibility = 'hidden';
+
+                    TSComponents.Card.render(containerId, {
+                        serieId: 'tn_arg', /* Serie válida para que funcione el render */
+                        explicitSign: false,
+                        color: color,
+                        links: 'none',
+                        hasChart: 'none',
+                        title: opts.label
+                    });
+
+                    /* Interceptamos cuando la API termine de renderizar su DOM */
+                    var checkInterval = setInterval(function () {
+                        var mainEl = container.querySelector('.c-main');
+                        if (mainEl && mainEl.textContent.trim() !== '') {
+                            /* Sobreescribimos con nuestro dato local */
+                            mainEl.textContent = opts.value;
+                            var unitsEl = container.querySelector('.c-units');
+                            if (unitsEl) unitsEl.textContent = opts.exactValue ? (opts.exactValue + ' personas') : '';
+
+                            var sourceEl = container.querySelector('.c-source');
+                            if (sourceEl) sourceEl.textContent = 'Año ' + opts.year;
+                            var titleEl = container.querySelector('.c-title');
+                            if (titleEl) titleEl.textContent = opts.label;
+
+                            /* Mostramos la tarjeta terminada */
+                            container.style.visibility = 'visible';
+                            clearInterval(checkInterval);
+                        }
+                    }, 50);
+
+                    /* Fallback de seguridad por si la API falla */
+                    setTimeout(function () {
+                        clearInterval(checkInterval);
+                        container.style.visibility = 'visible';
+                    }, 3000);
+                }
+            }
+
+            /* ── Highcharts base config ── */
+            function tsBaseConfig(overrides) {
+                var base = {
+                    chart: { zoomType: 'x', backgroundColor: 'transparent' },
+                    title: { text: null },
+                    xAxis: {
+                        type: 'linear', title: { text: null },
+                        labels: { format: '{value}', style: { color: '#888', fontSize: '11px' } },
+                        crosshair: { width: 1, color: '#ccc', dashStyle: 'Dot' },
+                        gridLineWidth: 0, tickWidth: 0, lineColor: '#ddd'
+                    },
+                    yAxis: {
+                        title: { text: null },
+                        labels: { style: { color: '#888', fontSize: '11px' }, formatter: function () { return this.value >= 1000 ? (this.value / 1000).toFixed(0) + 'k' : this.value; } },
+                        gridLineColor: '#f0f0f0', gridLineDashStyle: 'Dot'
+                    },
+                    tooltip: {
+                        shared: true, useHTML: true, backgroundColor: '#fff', borderColor: '#ddd', borderRadius: 8,
+                        shadow: { color: 'rgba(0,0,0,0.08)', offsetX: 0, offsetY: 2, width: 8 },
+                        style: { fontSize: '12px' },
+                        headerFormat: '<div style="font-weight:700;margin-bottom:6px;color:#333;">Año {point.x}</div>',
+                        pointFormat: '<div style="display:flex;align-items:center;gap:6px;margin:3px 0;"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:{series.color};"></span><span style="color:#666;">{series.name}:</span> <strong style="color:#333;">{point.y:,.0f}</strong></div>'
+                    },
+                    legend: {
+                        align: 'center', verticalAlign: 'bottom', layout: 'horizontal',
+                        itemStyle: { fontSize: '12px', fontWeight: '600', color: '#555' }, symbolRadius: 3
+                    },
+                    credits: { enabled: false },
+                    exporting: { enabled: false }
+                };
+                for (var k in overrides) {
+                    if (typeof overrides[k] === 'object' && !Array.isArray(overrides[k]) && base[k]) {
+                        for (var kk in overrides[k]) base[k][kk] = overrides[k][kk];
+                    } else { base[k] = overrides[k]; }
+                }
+                return base;
+            }
+
+            function makeSeriesData(key) {
+                var s = getFilteredSeries();
+                var anios = RAW.anios.map(function (a) { return parseInt(a, 10); });
+                return (s[key] || []).map(function (v, i) { return [anios[i], v]; });
+            }
+
+            /* ── Mock para interceptar llamadas asíncronas de TSComponents y proveer datos locales ── */
+            if (!window._sneepXhrMocked) {
+                var origOpen = XMLHttpRequest.prototype.open;
+                XMLHttpRequest.prototype.open = function(method, url) {
+                    this._url = url;
+                    return origOpen.apply(this, arguments);
+                };
+                var origSend = XMLHttpRequest.prototype.send;
+                XMLHttpRequest.prototype.send = function() {
+                    var xhr = this;
+                    if (xhr._url && xhr._url.indexOf('SNEEP_MOCK') !== -1) {
+                        var mockId = xhr._url.match(/SNEEP_MOCK_([a-zA-Z0-9_]+)/);
+                        if (mockId && window._sneepMocks && window._sneepMocks[mockId[1]]) {
+                            setTimeout(function() {
+                                var jsonStr = JSON.stringify(window._sneepMocks[mockId[1]]);
+                                Object.defineProperty(xhr, 'status', {value: 200});
+                                Object.defineProperty(xhr, 'readyState', {value: 4});
+                                Object.defineProperty(xhr, 'response', {value: jsonStr});
+                                Object.defineProperty(xhr, 'responseText', {value: jsonStr});
+                                xhr.getResponseHeader = function(name) {
+                                    if (name.toLowerCase() === 'content-type') return 'application/json; charset=utf-8';
+                                    return null;
+                                };
+                                xhr.getAllResponseHeaders = function() {
+                                    return 'content-type: application/json; charset=utf-8\r\n';
+                                };
+                                if (xhr.onreadystatechange) xhr.onreadystatechange();
+                                if (xhr.onload) xhr.onload();
+                            }, 10);
+                            return; 
+                        }
+                    }
+                    return origSend.apply(this, arguments);
+                };
+                window._sneepXhrMocked = true;
+                window._sneepMocks = {};
+            }
+
+            function setTSMockData(mockId, seriesObj, ids) {
+                var anios = RAW.anios;
+                var data = [];
+                for (var i = 0; i < anios.length; i++) {
+                    var row = [anios[i] + "-01-01"]; 
+                    for (var j = 0; j < ids.length; j++) {
+                        row.push(seriesObj[ids[j]][i]);
+                    }
+                    data.push(row);
+                }
+                var meta = [{ dataset: [], distribution: [], field: { id: "time", title: "Índice de tiempo", type: "date" } }];
+                for (var j = 0; j < ids.length; j++) {
+                    meta.push({ dataset: [], distribution: [], field: { id: ids[j], title: ids[j], type: "numeric" } });
+                }
+                window._sneepMocks[mockId] = { data: data, count: data.length, meta: meta };
+                return 'https://apis.datos.gob.ar/series/api/series/?ids=SNEEP_MOCK_' + mockId;
+            }
+
+            /* ── Gráficos por sección ── */
+            function renderSituacionLegal() {
+                if (!$('tsChartSmall1')) return;
+                Highcharts.chart('tsChartSmall1', tsBaseConfig({
+                    chart: { type: 'area', zoomType: 'x', backgroundColor: 'transparent', height: 340 },
+                    plotOptions: { area: { stacking: 'normal', lineWidth: 2, fillOpacity: 0.25, marker: { enabled: false, states: { hover: { enabled: true, radius: 5 } } } } },
+                    series: [
+                        { name: 'Condenados', data: makeSeriesData('condenados'), color: PALETTE.primary },
+                        { name: 'Procesados', data: makeSeriesData('procesados'), color: PALETTE.secondary },
+                        { name: 'Otros', data: makeSeriesData('otros'), color: PALETTE.gray }
+                    ]
+                }));
+            }
+
+            function renderGenero() {
+                var containerId = 'genero-chart';
+                var container = $(containerId);
+                if (!container) return;
+                
+                // Use Highcharts directly for gender distribution
+                Highcharts.chart(containerId, tsBaseConfig({
+                    chart: { type: 'area', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    plotOptions: { area: { stacking: 'normal', lineWidth: 2, marker: { enabled: false, states: { hover: { enabled: true, radius: 5 } } } } },
+                    series: [
+                        { name: 'Varones', data: makeSeriesData('varones'), color: PALETTE.primary },
+                        { name: 'Mujeres', data: makeSeriesData('mujeres'), color: PALETTE.secondary },
+                        { name: 'Trans', data: makeSeriesData('trans'), color: PALETTE.tertiary }
+                    ]
+                }));
+            }
+
+            function renderEdad() {
+                if (!$('edad-chart')) return;
+                Highcharts.chart('edad-chart', tsBaseConfig({
+                    chart: { type: 'column', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    plotOptions: { column: { stacking: 'normal', borderRadius: 2, borderWidth: 0, pointPadding: 0.05, groupPadding: 0.1 } },
+                    series: [
+                        { name: '18-20 años', data: makeSeriesData('edad_18_20'), color: '#42A5F5' },
+                        { name: '21-34 años', data: makeSeriesData('edad_21_34'), color: PALETTE.primary },
+                        { name: '35+ años', data: makeSeriesData('edad_35_plus'), color: '#0D47A1' }
+                    ]
+                }));
+            }
+
+            function renderNacionalidad() {
+                if (!$('nacionalidad-chart')) return;
+                Highcharts.chart('nacionalidad-chart', tsBaseConfig({
+                    chart: { type: 'areaspline', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    plotOptions: { areaspline: { fillOpacity: 0.15, lineWidth: 2.5, marker: { enabled: false, states: { hover: { enabled: true, radius: 5 } } } } },
+                    series: [
+                        { name: 'Argentinos', data: makeSeriesData('nacionalidad_argentino'), color: PALETTE.primary },
+                        { name: 'Ext. país limítrofe', data: makeSeriesData('nacionalidad_limitrofe'), color: PALETTE.quaternary },
+                        { name: 'Ext. otros países', data: makeSeriesData('nacionalidad_otros'), color: PALETTE.quinary }
+                    ]
+                }));
+            }
+
+            function renderInstruccion() {
+                var containerId = 'instruccion-chart';
+                var container = $(containerId);
+                if (!container) return;
+
+                // Obtain filtered series data
+                var s = getFilteredSeries();
+                // Prepare data for each series using helper makeSeriesData (assumes it exists similar to other charts)
+                var seriesData = [
+                    { name: 'Hasta primario', data: makeSeriesData('instruccion_primario'), color: '#1565C0' },
+                    { name: 'Secundario', data: makeSeriesData('instruccion_secundario'), color: '#42A5F5' },
+                    { name: 'Terciario / Universitario', data: makeSeriesData('instruccion_terciario_uni'), color: '#90CAF9' }
+                ];
+
+                // Clear any previous content
+                container.innerHTML = '';
+
+                // Render using Highcharts directly
+                Highcharts.chart(containerId, tsBaseConfig({
+                    chart: { type: 'column', zoomType: 'x', backgroundColor: 'transparent', height: 320 },
+                    title: { text: 'Nivel de instrucción' },
+                    legend: { enabled: true },
+                    tooltip: { shared: true },
+                    plotOptions: { column: { stacking: 'percent', borderRadius: 2, pointPadding: 0.1, groupPadding: 0.1 } },
+                    series: seriesData,
+                    credits: { enabled: false },
+                    source: { text: 'Fuente: SNEEP – Ministerio de Justicia de la Nación' }
+                }));
+            }
+
+            /* ── KPIs ── */
+            function renderKPIs(anio) {
+                renderTSCard('poblacion-card-med', { serieKey: 'total', title: 'Población Penitenciaria', year: anio, color: PALETTE.primary, units: 'Total Nacional' });
+                renderTSCard('tasa-card-med', { serieKey: 'tasa_cada_100mil', title: 'Tasa c/100.000 hab.', year: anio, color: PALETTE.secondary, units: 'Cada 100.000 habitantes', format: 'decimal' });
+                renderTSCard('capacidad-card-med', { serieKey: 'capacidad_operativa', title: 'Capacidad Operativa', year: anio, color: PALETTE.tertiary, units: 'Plazas disponibles' });
+
+                var s = getFilteredSeries();
+                var i = RAW.anios.indexOf(String(anio));
+                if (i < 0) return;
+                var t = s.total[i];
+                if (t === 0) t = 1;
+
+                renderTSMinimalCard('comp-condenados-card', { value: pct(s.condenados[i] / t * 100), exactValue: fmt(s.condenados[i]), label: 'Condenados', year: anio, color: '#0072BB' });
+                renderTSMinimalCard('comp-varones-card', { value: pct(s.varones[i] / t * 100), exactValue: fmt(s.varones[i]), label: 'Varones', year: anio, color: '#2e7d32' });
+                renderTSMinimalCard('comp-argentinos-card', { value: pct(s.nacionalidad_argentino[i] / t * 100), exactValue: fmt(s.nacionalidad_argentino[i]), label: 'Argentinos', year: anio, color: '#F44336' });
+                renderTSMinimalCard('comp-edad-card', { value: pct((s.edad_18_20[i] + s.edad_21_34[i]) / t * 100), exactValue: fmt(s.edad_18_20[i] + s.edad_21_34[i]), label: 'Menores de 35 años', year: anio, color: '#FF9800' });
+
+                $('legal-value-condenados').textContent = pct(s.condenados[i] / t * 100);
+                $('legal-value-procesados').textContent = pct(s.procesados[i] / t * 100);
+                $('legal-value-otros').textContent = pct(s.otros[i] / t * 100);
+
+                $('genero-value-varones').textContent = pct(s.varones[i] / t * 100);
+                $('genero-value-mujeres').textContent = pct(s.mujeres[i] / t * 100);
+                $('genero-value-trans').textContent = t > 0 ? pct(s.trans[i] / t * 100) : '0 %';
+
+                $('edad-value-18-20').textContent = pct(s.edad_18_20[i] / t * 100);
+                $('edad-value-21-34').textContent = pct(s.edad_21_34[i] / t * 100);
+                $('edad-value-35-plus').textContent = pct(s.edad_35_plus[i] / t * 100);
+
+                $('nac-value-argentino').textContent = pct(s.nacionalidad_argentino[i] / t * 100);
+                $('nac-value-limitrofe').textContent = pct(s.nacionalidad_limitrofe[i] / t * 100);
+                $('nac-value-otros').textContent = pct(s.nacionalidad_otros[i] / t * 100);
+
+                $('inst-value-primario').textContent = pct(s.instruccion_primario[i] / t * 100);
+                $('inst-value-secundario').textContent = pct(s.instruccion_secundario[i] / t * 100);
+                $('inst-value-terciario-uni').textContent = pct(s.instruccion_terciario_uni[i] / t * 100);
+
+                document.querySelectorAll('.kpi-year').forEach(function (el) { el.textContent = anio; });
+            }
+
+            function renderAll() {
+                var anio = $('edit-anio').value;
+                renderKPIs(anio);
+                renderSituacionLegal();
+                renderGenero();
+                renderEdad();
+                renderNacionalidad();
+                renderInstruccion();
+            }
+
+            /* ── Filtros ── */
+            function populateSelect(sel, items) {
+                sel.innerHTML = '';
+                items.forEach(function (it) {
+                    var o = document.createElement('option');
+                    o.value = it.key; o.textContent = it.label;
+                    sel.appendChild(o);
+                });
+            }
+
+            function populateFilters() {
+                var anioSel = $('edit-anio');
+                var jurSel = $('edit-jurisdiccion');
+                var delSel = $('edit-delito');
+
+                RAW.anios.slice().reverse().forEach(function (a) {
+                    var o = document.createElement('option');
+                    o.value = a; o.textContent = a;
+                    anioSel.appendChild(o);
+                });
+
+                var jurItems = [];
+                var jurKeys = Object.keys(RAW.filtros.jurisdicciones);
+                for (var j = 0; j < jurKeys.length; j++) {
+                    jurItems.push({ key: jurKeys[j], label: RAW.filtros.jurisdicciones[jurKeys[j]].label });
+                }
+                populateSelect(jurSel, jurItems);
+
+                var delItems = [];
+                var delKeys = Object.keys(RAW.filtros.delitos);
+                for (var d = 0; d < delKeys.length; d++) {
+                    delItems.push({ key: delKeys[d], label: RAW.filtros.delitos[delKeys[d]].label });
+                }
+                populateSelect(delSel, delItems);
+
+                anioSel.addEventListener('change', renderAll);
+                jurSel.addEventListener('change', renderAll);
+                delSel.addEventListener('change', renderAll);
+            }
+
+            /* ── Init ── */
+            function init() {
+                try {
+                    fetch('assets/data/datos-sneep.json')
+                        .then(function (r) { if (!r.ok) throw new Error('fail'); return r.json(); })
+                        .then(function (d) {
+                            if (d.anios) RAW.anios = d.anios;
+                            if (d.filtros) RAW.filtros = d.filtros;
+                            if (d.series) RAW.series = d.series;
+                        })
+                        .catch(function () { console.warn('Usando datos embebidos'); })
+                        .finally(function () {
+                            populateFilters();
+                            renderAll();
+                        });
+                } catch (e) {
+                    console.warn('Error:', e);
+                    populateFilters();
+                    renderAll();
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+
+</html>

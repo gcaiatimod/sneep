@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#242C4F">
+    <title>Pasos Internacionales | Argentina.gob.ar</title>
+    <link rel="icon" href="https://qa2-back.argentina.gob.ar/profiles/argentinagobar/themes/argentinagobar/argentinagobar_theme/favicon.ico" type="image/x-icon">
+    <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Encode+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap" media="all">
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" media="all">
+    <link rel="stylesheet" href="https://www.argentina.gob.ar/profiles/argentinagobar/themes/contrib/poncho/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://www.argentina.gob.ar/profiles/argentinagobar/themes/contrib/poncho/css/icono-arg.css">
+    <link rel="stylesheet" href="https://www.argentina.gob.ar/profiles/argentinagobar/themes/contrib/poncho/css/poncho.min.css">
+    <style>
+        /* Alertas carousel */
+        .alertas-wrapper { position: relative; overflow: hidden; }
+        .alertas-track { display: flex; transition: transform 0.4s ease; gap: 15px; align-items: stretch; }
+        .alerta-card { width: calc(33.3333% - 10px); flex: 0 0 auto; display: flex; flex-direction: column; }
+        .alerta-card p { flex-grow: 1; }
+        .label-light-warning { background-color: #FDEBAE; color: #333; }
+        .label-light-info { background-color: #D0E7FF; color: #333; }
+        .label-light-success { background-color: #C3F0CB; color: #333; }
+        .alertas-nav { background: #fff; border: 1px solid #DEE2E6; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #6c757d; }
+        .alertas-nav:hover { background: #f8f9fa; color: #333; }
+        @media (max-width: 767px) {
+            .alerta-card { width: 100%; }
+        }
+        @media (min-width: 768px) and (max-width: 991px) {
+            .alerta-card { width: calc(50% - 7.5px); }
+        }
+    </style>
+</head>
+
+<body class="html no-sidebars">
+
+    <!-- Encabezado Oficial -->
+    <header>
+        <nav class="navbar navbar-top navbar-default border-bottom-amarillo">
+            <div class="container">
+                <div>
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="https://www.argentina.gob.ar/" id="navbar-brand" aria-label="Argentina.gob.ar Presidencia de la Nación">
+                            <img src="https://www.argentina.gob.ar/profiles/argentinagobar/themes/argentinagobar/argentinagobar_theme/logo_argentina-azul.svg" alt="Argentina.gob.ar" height="50" width="254">
+                        </a>
+                        <a class="btn btn-mi-argentina btn-login visible-xs bg-miarg-azul" href="https://mi.argentina.gob.ar" title="Ingresar a Mi Argentina">
+                            <i class="icono-arg-mi-argentina text-white"></i><span class="sr-only">Ir a Mi Argentina</span>
+                        </a>
+                        <button class="btn btn-mi-argentina btn-login visible-xs" aria-labelledby="edit-keys"><span class="fa fa-search fa-fw"></span><span class="sr-only">Buscar</span></button>
+                    </div>
+                    <div class="nav navbar-nav navbar-right hidden-xs">
+                        <button class="btn btn-link btn-search-reset visible-xs"><i class="fa fa-times"><span class="sr-only">Cerrar el buscador</span></i></button>
+                        <div id="cd-login">
+                            <a href="https://mi.argentina.gob.ar/" id="btn-mi-argentina" class="btn hidden-xs p-l-1 btn-login bg-miarg-azul" aria-label="Ingresar a Mi Argentina">
+                                <i class="fa-3x fa icono-arg-mi-argentina-extended text-white p-t-0"><span class="sr-only">Mi Argentina</span></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        <div class="container margin-bottom-4">
+            <div class="region region-content">
+                <div id="block-system-main" class="block block-system clearfix">
+
+                    <!-- Migas de pan -->
+                    <div class="row m-t-2">
+                        <div class="col-md-12">
+                            <ol class="breadcrumb pull-left device-breadcrumb" role="list" aria-label="Migas de pan">
+                                <li><a href="https://www.argentina.gob.ar/">Inicio</a></li>
+                                <li><a href="#">Seguridad y Justicia</a></li>
+                                <li class="active">Pasos Internacionales</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Título -->
+                    <div class="row m-t-3">
+                        <div class="col-md-12">
+                            <h1 class="margin-bottom-2">Pasos Internacionales</h1>
+                            <p class="lead margin-bottom-3">Información actualizada sobre el estado y condiciones de los pasos fronterizos de la República Argentina.</p>
+                            <hr class="margin-top-1 margin-bottom-4">
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SECCIÓN 1: ALERTAS EN TIEMPO REAL -->
+                    <!-- ============================================== -->
+                    <div class="row m-b-3">
+                        <div class="col-md-12">
+                            <div class="clearfix m-b-2">
+                                <h3 class="pull-left m-y-0 text-primary"><i class="fa fa-warning text-danger m-r-1"></i> Alertas en tiempo real</h3>
+                                <div class="pull-right">
+                                    <button class="alertas-nav pull-left m-r-1" onclick="moverAlertas(-1)" aria-label="Anterior">&#8249;</button>
+                                    <button class="alertas-nav pull-left" onclick="moverAlertas(1)" aria-label="Siguiente">&#8250;</button>
+                                </div>
+                            </div>
+                            <div class="alertas-wrapper">
+                                <div class="alertas-track" id="alertasTrack">
+
+                                    <div class="alerta-card panel panel-default m-b-0" style="padding: 16px;">
+                                        <div class="clearfix m-b-1">
+                                            <span class="label label-light-warning pull-left" style="font-size: 11px; padding: 4px 8px;">PASO JAMA</span>
+                                            <span class="text-muted small pull-right">Hace 15 min</span>
+                                        </div>
+                                        <h4 class="m-t-1 m-b-1 text-dark"><strong>Funcionamiento Intermitente</strong></h4>
+                                        <p class="text-muted small">Debido a condiciones meteorológicas inestables en el lado chileno. Se recomienda verificar antes de viajar.</p>
+                                        <a href="#" class="text-primary font-weight-bold small m-t-auto">Más detalles &rarr;</a>
+                                    </div>
+
+                                    <div class="alerta-card panel panel-default m-b-0" style="padding: 16px;">
+                                        <div class="clearfix m-b-1">
+                                            <span class="label label-light-info pull-left" style="font-size: 11px; padding: 4px 8px;">CRISTO REDENTOR</span>
+                                            <span class="text-muted small pull-right">Hace 40 min</span>
+                                        </div>
+                                        <h4 class="m-t-1 m-b-1 text-dark"><strong>Alta afluencia de tránsito</strong></h4>
+                                        <p class="text-muted small">Demoras estimadas de 3 horas en los controles aduaneros. Tránsito fluido en ruta.</p>
+                                        <a href="#" class="text-primary font-weight-bold small m-t-auto">Más detalles &rarr;</a>
+                                    </div>
+
+                                    <div class="alerta-card panel panel-default m-b-0" style="padding: 16px;">
+                                        <div class="clearfix m-b-1">
+                                            <span class="label label-light-warning pull-left" style="font-size: 11px; padding: 4px 8px;">PASO PEHUENCHE</span>
+                                            <span class="text-muted small pull-right">Hace 1 hora</span>
+                                        </div>
+                                        <h4 class="m-t-1 m-b-1 text-dark"><strong>Cadenas Obligatorias</strong></h4>
+                                        <p class="text-muted small">Habilitado solo para vehículos livianos con portación obligatoria de cadenas por hielo en calzada.</p>
+                                        <a href="#" class="text-primary font-weight-bold small m-t-auto">Más detalles &rarr;</a>
+                                    </div>
+
+                                    <div class="alerta-card panel panel-default m-b-0" style="padding: 16px;">
+                                        <div class="clearfix m-b-1">
+                                            <span class="label label-light-success pull-left" style="font-size: 11px; padding: 4px 8px;">PASO HUA HUM</span>
+                                            <span class="text-muted small pull-right">Hace 2 horas</span>
+                                        </div>
+                                        <h4 class="m-t-1 m-b-1 text-dark"><strong>Operativo Normal</strong></h4>
+                                        <p class="text-muted small">Tránsito fluido, sin demoras en controles migratorios ni aduaneros. Condiciones climáticas favorables.</p>
+                                        <a href="#" class="text-primary font-weight-bold small m-t-auto">Más detalles &rarr;</a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SECCIÓN 2: HERO INFORMACIÓN ÚTIL + NOVEDADES -->
+                    <!-- ============================================== -->
+                    <div class="row m-b-3">
+                        <div class="col-md-12">
+
+                            <!-- Hero info útil -->
+                            <div class="m-b-3" style="background-color: #F2F2F2; border-radius: 4px; overflow: hidden;">
+                                <div class="row" style="margin: 0;">
+                                    <div class="col-sm-6" style="padding: 0;">
+                                        <img src="https://www.argentina.gob.ar/sites/default/files/2024-01/paso_internacional_0.jpg" alt="Paso fronterizo" class="img-responsive" style="object-fit: cover; height: 100%; width: 100%; min-height: 200px;">
+                                    </div>
+                                    <div class="col-sm-6" style="padding: 30px 24px;">
+                                        <h3 class="m-t-0 text-primary"><i class="fa fa-info-circle text-primary m-r-1"></i> Información útil</h3>
+                                        <p class="text-muted">Encontrá todo lo que necesitás saber para salir o entrar del país a través de los pasos fronterizos.</p>
+                                        <a href="#" class="btn btn-primary m-t-2">Ver Información</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Novedades -->
+                            <h2 class="m-b-2">Novedades</h2>
+                            <div class="row">
+
+                                <div class="col-sm-6 col-md-3 m-b-2">
+                                    <div>
+                                        <img src="https://www.argentina.gob.ar/sites/default/files/2026-03/viii-reunion_cnf.jpg" alt="VIII Reunión CNF" class="img-responsive img-rounded m-b-1" style="height: 130px; width: 100%; object-fit: cover;">
+                                        <p class="text-muted small m-b-0">26 de marzo de 2026</p>
+                                        <h5 class="m-t-0"><strong><a href="#" class="text-primary">Se realizó la VIII Reunión de la Comisión Nacional de Fronteras</a></strong></h5>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 m-b-2">
+                                    <div>
+                                        <img src="https://www.argentina.gob.ar/sites/default/files/2025-08/vi-reunion_cnf.jpg" alt="VI Reunión CNF" class="img-responsive img-rounded m-b-1" style="height: 130px; width: 100%; object-fit: cover;">
+                                        <p class="text-muted small m-b-0">28 de agosto de 2025</p>
+                                        <h5 class="m-t-0"><strong><a href="#" class="text-primary">VI Reunión de la Comisión Nacional de Fronteras de la Jefatura de Gabinete</a></strong></h5>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 m-b-2">
+                                    <div>
+                                        <img src="https://www.argentina.gob.ar/sites/default/files/2025-05/decomiso_amba.jpg" alt="Decomiso AMBA" class="img-responsive img-rounded m-b-1" style="height: 130px; width: 100%; object-fit: cover;">
+                                        <p class="text-muted small m-b-0">05 de mayo de 2025</p>
+                                        <h5 class="m-t-0"><strong><a href="#" class="text-primary">AMBA: Decomiso de más de 13 toneladas de productos de ingreso no permitido</a></strong></h5>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-6 col-md-3 m-b-2">
+                                    <div>
+                                        <img src="https://www.argentina.gob.ar/sites/default/files/2025-04/paso_agua_negra.jpg" alt="Paso Agua Negra" class="img-responsive img-rounded m-b-1" style="height: 130px; width: 100%; object-fit: cover;">
+                                        <p class="text-muted small m-b-0">28 de abril de 2025</p>
+                                        <h5 class="m-t-0"><strong><a href="#" class="text-primary">Paso Internacional Agua Negra: Se busca agilizar controles y tránsito</a></strong></h5>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <a href="#" class="btn btn-default m-t-1">Ver más</a>
+
+                        </div>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- SECCIÓN 3: INSTITUCIONAL -->
+                    <!-- ============================================== -->
+                    <div class="row m-t-3 m-b-4">
+                        <div class="col-md-12">
+                            <h3 class="m-b-2"><strong>Institucional</strong></h3>
+                            <div class="col-sm-6 col-md-4 p-l-0">
+                                <a href="#" class="panel panel-default text-primary d-block" style="padding: 14px 16px; text-decoration: none;">
+                                    <strong>Acerca de este sitio</strong>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pie de página Oficial -->
+    <footer class="main-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Trámites</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/turnos">Turnos</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/tad">Trámites a distancia</a></li>
+                            <li class="last leaf"><a href="https://www.argentina.gob.ar/miargentina/mesadeayuda">Atención a la ciudadanía</a></li>
+                        </ul>
+                    </section>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Acerca de la República Argentina</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/pais">Nuestro país</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/normativa">Leyes argentinas</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/organismos">Organismos</a></li>
+                            <li class="last leaf"><a href="https://www.argentina.gob.ar/desregulacion/mapa-del-estado">Mapa del Estado</a></li>
+                        </ul>
+                    </section>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <section class="block block-menu clearfix">
+                        <h2 class="block-title h3 section-title">Acerca de Argentina.gob.ar</h2>
+                        <ul class="menu nav">
+                            <li class="first leaf"><a href="https://www.argentina.gob.ar/acerca">Acerca de este sitio</a></li>
+                            <li class="leaf"><a href="https://www.argentina.gob.ar/terminos-y-condiciones">Términos y condiciones</a></li>
+                            <li class="last leaf"><a href="https://www.argentina.gob.ar/sugerencias">Sugerencias</a></li>
+                        </ul>
+                    </section>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid border-top-amarillo">
+            <div class="row sub-footer">
+                <div class="container">
+                    <div class="col-sm-6 m-y-1 p-x-0"></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var offset = 0;
+        function moverAlertas(dir) {
+            var track = document.getElementById('alertasTrack');
+            var cards = track.querySelectorAll('.alerta-card');
+            var visibles = window.innerWidth < 768 ? 1 : window.innerWidth < 992 ? 2 : 3;
+            var max = cards.length - visibles;
+            offset = Math.max(0, Math.min(max, offset + dir));
+            var cardWidth = cards[0].offsetWidth;
+            var gap = 15;
+            track.style.transform = 'translateX(-' + (offset * (cardWidth + gap)) + 'px)';
+        }
+        
+        window.addEventListener('resize', function() {
+            moverAlertas(0);
+        });
+    </script>
+
+</body>
+</html>
